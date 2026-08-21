@@ -51,7 +51,7 @@ export function Hero() {
             </Link>
 
             <Link
-              href="/plantas"
+              href="/tienda?categoria=plantas"
               className="inline-flex items-center justify-center rounded-xl border border-border bg-background/70 px-6 py-3.5 font-medium backdrop-blur-md transition hover:bg-background"
             >
               Descubrir plantas
