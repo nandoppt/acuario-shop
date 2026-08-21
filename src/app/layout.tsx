@@ -1,14 +1,24 @@
-
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
 import "./globals.css";
 
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "VidaBajoAgua",
+  title: {
+    default: "VidaBajoAgua",
+    template: "%s | VidaBajoAgua",
+  },
   description:
-    "Todo para crear, cuidar y disfrutar tu mundo acuático.",
+    "Plantas, equipamiento y accesorios para crear y disfrutar tu mundo acuático.",
 };
 
 export default function RootLayout({
@@ -18,7 +28,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="min-h-screen bg-background text-foreground antialiased">
+      <body
+        className={`${inter.variable} min-h-screen bg-background text-foreground antialiased`}
+      >
         <Navbar />
 
         <main>{children}</main>
