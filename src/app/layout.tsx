@@ -5,6 +5,7 @@ import "./globals.css";
 
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { CartProvider } from "@/components/cart/cart-context";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,14 +30,14 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${inter.variable} min-h-screen bg-background text-foreground antialiased`}
-      >
-        <Navbar />
-
-        <main>{children}</main>
-
-        <Footer />
-      </body>
+  className={`${inter.variable} min-h-screen bg-background text-foreground antialiased`}
+>
+  <CartProvider>
+    <Navbar />
+    <main>{children}</main>
+    <Footer />
+  </CartProvider>
+</body>
     </html>
   );
 }

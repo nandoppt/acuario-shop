@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { Search, ShoppingCart, User, Menu } from "lucide-react";
+import { CartButton } from "../cart/cart-button";
 
 export function Navbar() {
   return (
@@ -34,10 +35,7 @@ export function Navbar() {
           </button>
 
           <button className="relative rounded-full p-2 hover:bg-muted">
-            <ShoppingCart size={20} />
-            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-              0
-            </span>
+            <CartButton />
           </button>
 
           <button className="rounded-full p-2 md:hidden hover:bg-muted">

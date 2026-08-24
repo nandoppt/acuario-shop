@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ArrowLeft, Package, ShoppingCart, Truck } from "lucide-react";
+import { ArrowLeft, Package, Truck } from "lucide-react";
 
 import { getProductBySlug } from "@/lib/catalog/mock-products";
+import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 
 type ProductPageProps = {
   params: Promise<{
@@ -141,15 +142,10 @@ export default async function ProductPage({
               </div>
             </div>
 
-            <button
+            <AddToCartButton
+              productId={product.id}
               disabled={product.stock === 0}
-              className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-4 font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <ShoppingCart size={20} />
-              {product.stock > 0
-                ? "Agregar al carrito"
-                : "Producto agotado"}
-            </button>
+            />
           </div>
         </div>
       </section>
