@@ -1,9 +1,8 @@
 import { CategoryGrid } from "@/components/home/category-grid";
 import { ProductGrid } from "@/components/product/product-grid";
-import {
-  mockProducts,
-  type ProductCategory,
-} from "@/lib/catalog/mock-products";
+import { getProducts } from "@/lib/catalog/products";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Tienda",
@@ -17,33 +16,26 @@ type TiendaPageProps = {
   }>;
 };
 
-const validCategories: ProductCategory[] = [
-  "plantas",
-  "iluminacion",
-  "filtracion",
-  "sustratos",
-  "co2",
-  "fertilizacion",
-  "alimentacion",
-  "accesorios",
-];
-
 export default async function TiendaPage({
   searchParams,
 }: TiendaPageProps) {
   const params = await searchParams;
 
-  const selectedCategory = validCategories.includes(
-    params.categoria as ProductCategory,
-  )
-    ? (params.categoria as ProductCategory)
-    : undefined;
+  const products = await getProducts();
+
+  const selectedCategory = params.categoria;
 
   const filteredProducts = selectedCategory
-    ? mockProducts.filter(
-        (product) => product.category === selectedCategory,
+    ? products.filter(
+        (product) =>
+          product.categories?.slug === selectedCategory,
       )
-    : mockProducts;
+    : products;
+
+  const categoryLabel =
+    filteredProducts[0]?.categories?.name ??
+    selectedCategory ??
+    "Todos los productos";
 
   return (
     <div className="min-h-screen">
@@ -78,7 +70,7 @@ export default async function TiendaPage({
 
             <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">
               {selectedCategory
-                ? `Productos de ${selectedCategory}`
+                ? `Productos de ${categoryLabel}`
                 : "Todos los productos"}
             </h2>
 

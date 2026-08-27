@@ -4,36 +4,45 @@ import {
   Package,
 } from "lucide-react";
 
-import type { Product } from "@/lib/catalog/mock-products";
-
-const categoryNames: Record<Product["category"], string> = {
-  plantas: "Plantas",
-  iluminacion: "Iluminación",
-  filtracion: "Filtración",
-  sustratos: "Sustratos",
-  co2: "CO₂",
-  fertilizacion: "Fertilización",
-  alimentacion: "Alimentación",
-  accesorios: "Accesorios",
-};
+import type { CatalogProduct } from "@/types/catalog";
 
 type ProductCardProps = {
-  product: Product;
+  product: CatalogProduct;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({
+  product,
+}: ProductCardProps) {
   const hasDiscount =
-    product.previousPrice !== undefined &&
-    product.previousPrice > product.price;
+    product.compare_at_price !== null &&
+    product.compare_at_price > product.price;
+
+  const stock =
+    product.inventory?.quantity ?? 0;
+
+  const primaryImage =
+    product.images
+      ?.filter((image) => image.is_primary)
+      .sort(
+        (a, b) => a.sort_order - b.sort_order,
+      )[0] ??
+    product.images
+      ?.slice()
+      .sort(
+        (a, b) => a.sort_order - b.sort_order,
+      )[0];
 
   return (
     <article className="group overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
       <Link href={`/producto/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
-          {product.image ? (
+          {primaryImage ? (
             <img
-              src={product.image}
-              alt={product.name}
+              src={primaryImage.url}
+              alt={
+                primaryImage.alt_text ??
+                product.name
+              }
               className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
           ) : (
@@ -50,7 +59,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </div>
           )}
 
-          {product.featured && (
+          {product.is_featured && (
             <span className="absolute left-4 top-4 rounded-full bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
               Destacado
             </span>
@@ -60,7 +69,8 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <div className="p-5">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-primary">
-          {categoryNames[product.category]}
+          {product.categories?.name ??
+            "Sin categoría"}
         </p>
 
         <Link href={`/producto/${product.slug}`}>
@@ -70,14 +80,19 @@ export function ProductCard({ product }: ProductCardProps) {
         </Link>
 
         <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-          {product.description}
+          {product.short_description ??
+            product.description ??
+            ""}
         </p>
 
         <div className="mt-5 flex items-end justify-between gap-4">
           <div>
             {hasDiscount && (
               <p className="text-sm text-muted-foreground line-through">
-                ${product.previousPrice?.toFixed(2)}
+                $
+                {product.compare_at_price?.toFixed(
+                  2,
+                )}
               </p>
             )}
 
@@ -96,8 +111,8 @@ export function ProductCard({ product }: ProductCardProps) {
         </div>
 
         <div className="mt-4 border-t border-border pt-3 text-xs text-muted-foreground">
-          {product.stock > 0
-            ? `${product.stock} disponibles`
+          {stock > 0
+            ? `${stock} disponibles`
             : "Agotado"}
         </div>
       </div>

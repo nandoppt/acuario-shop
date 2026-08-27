@@ -9,16 +9,12 @@ import {
   useState,
 } from "react";
 
-import {
-  mockProducts,
-  type Product,
-} from "@/lib/catalog/mock-products";
-
 import type { CartItem } from "@/lib/cart/cart-types";
+import type { CatalogProduct } from "@/types/catalog";
 
 type CartContextValue = {
   items: CartItem[];
-  products: Product[];
+  products: CatalogProduct[];
   itemCount: number;
   subtotal: number;
 
@@ -40,11 +36,16 @@ export function CartProvider({
   children: React.ReactNode;
 }) {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [products, setProducts] = useState<CatalogProduct[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  /*
+   * Cargar carrito guardado
+   */
   useEffect(() => {
     try {
-      const storedCart = localStorage.getItem(STORAGE_KEY);
+      const storedCart =
+        localStorage.getItem(STORAGE_KEY);
 
       if (storedCart) {
         const parsedCart = JSON.parse(storedCart);
@@ -60,6 +61,43 @@ export function CartProvider({
     }
   }, []);
 
+  /*
+   * Cargar catálogo real desde Supabase
+   */
+  useEffect(() => {
+    async function loadProducts() {
+      try {
+        const response = await fetch(
+          "/api/catalog/products",
+          {
+            cache: "no-store",
+          },
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            "No se pudo cargar el catálogo.",
+          );
+        }
+
+        const data =
+          (await response.json()) as CatalogProduct[];
+
+        setProducts(data);
+      } catch (error) {
+        console.error(
+          "Error cargando productos:",
+          error,
+        );
+      }
+    }
+
+    loadProducts();
+  }, []);
+
+  /*
+   * Guardar carrito
+   */
   useEffect(() => {
     if (!isHydrated) {
       return;
@@ -71,13 +109,19 @@ export function CartProvider({
     );
   }, [items, isHydrated]);
 
+  /*
+   * Agregar producto
+   */
   const addItem = useCallback(
     (productId: string, quantity = 1) => {
-      const product = mockProducts.find(
+      const product = products.find(
         (item) => item.id === productId,
       );
 
-      if (!product || product.stock <= 0) {
+      const stock =
+        product?.inventory?.quantity ?? 0;
+
+      if (!product || stock <= 0) {
         return;
       }
 
@@ -91,7 +135,10 @@ export function CartProvider({
             ...currentItems,
             {
               productId,
-              quantity: Math.min(quantity, product.stock),
+              quantity: Math.min(
+                quantity,
+                stock,
+              ),
             },
           ];
         }
@@ -102,29 +149,42 @@ export function CartProvider({
                 ...item,
                 quantity: Math.min(
                   item.quantity + quantity,
-                  product.stock,
+                  stock,
                 ),
               }
             : item,
         );
       });
     },
+    [products],
+  );
+
+  /*
+   * Eliminar producto
+   */
+  const removeItem = useCallback(
+    (productId: string) => {
+      setItems((currentItems) =>
+        currentItems.filter(
+          (item) =>
+            item.productId !== productId,
+        ),
+      );
+    },
     [],
   );
 
-  const removeItem = useCallback((productId: string) => {
-    setItems((currentItems) =>
-      currentItems.filter(
-        (item) => item.productId !== productId,
-      ),
-    );
-  }, []);
-
+  /*
+   * Actualizar cantidad
+   */
   const updateQuantity = useCallback(
     (productId: string, quantity: number) => {
-      const product = mockProducts.find(
+      const product = products.find(
         (item) => item.id === productId,
       );
+
+      const stock =
+        product?.inventory?.quantity ?? 0;
 
       if (!product) {
         return;
@@ -142,55 +202,81 @@ export function CartProvider({
                 ...item,
                 quantity: Math.min(
                   quantity,
-                  product.stock,
+                  stock,
                 ),
               }
             : item,
         ),
       );
     },
-    [removeItem],
+    [products, removeItem],
   );
 
+  /*
+   * Vaciar carrito
+   */
   const clearCart = useCallback(() => {
     setItems([]);
   }, []);
 
-  const products = useMemo(() => {
+  /*
+   * Productos que realmente están en el carrito
+   */
+  const cartProducts = useMemo(() => {
     return items
       .map((item) =>
-        mockProducts.find(
-          (product) => product.id === item.productId,
+        products.find(
+          (product) =>
+            product.id === item.productId,
         ),
       )
-      .filter((product): product is Product => Boolean(product));
-  }, [items]);
+      .filter(
+        (
+          product,
+        ): product is CatalogProduct =>
+          Boolean(product),
+      );
+  }, [items, products]);
 
+  /*
+   * Cantidad total
+   */
   const itemCount = useMemo(() => {
     return items.reduce(
-      (total, item) => total + item.quantity,
+      (total, item) =>
+        total + item.quantity,
       0,
     );
   }, [items]);
 
+  /*
+   * Subtotal
+   */
   const subtotal = useMemo(() => {
-    return items.reduce((total, item) => {
-      const product = mockProducts.find(
-        (product) => product.id === item.productId,
-      );
+    return items.reduce(
+      (total, item) => {
+        const product = products.find(
+          (product) =>
+            product.id === item.productId,
+        );
 
-      if (!product) {
-        return total;
-      }
+        if (!product) {
+          return total;
+        }
 
-      return total + product.price * item.quantity;
-    }, 0);
-  }, [items]);
+        return (
+          total +
+          product.price * item.quantity
+        );
+      },
+      0,
+    );
+  }, [items, products]);
 
   const value = useMemo(
     () => ({
       items,
-      products,
+      products: cartProducts,
       itemCount,
       subtotal,
       addItem,
@@ -200,7 +286,7 @@ export function CartProvider({
     }),
     [
       items,
-      products,
+      cartProducts,
       itemCount,
       subtotal,
       addItem,

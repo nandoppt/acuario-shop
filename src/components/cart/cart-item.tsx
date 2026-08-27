@@ -1,12 +1,16 @@
 "use client";
 
-import { Minus, Plus, Trash2 } from "lucide-react";
+import {
+  Minus,
+  Plus,
+  Trash2,
+} from "lucide-react";
 
 import { useCart } from "@/components/cart/cart-context";
-import type { Product } from "@/lib/catalog/mock-products";
+import type { CatalogProduct } from "@/types/catalog";
 
 type CartItemProps = {
-  product: Product;
+  product: CatalogProduct;
   quantity: number;
 };
 
@@ -14,9 +18,13 @@ export function CartItem({
   product,
   quantity,
 }: CartItemProps) {
-  const { updateQuantity, removeItem } = useCart();
+  const {
+    updateQuantity,
+    removeItem,
+  } = useCart();
 
-  const itemTotal = product.price * quantity;
+  const itemTotal =
+    product.price * quantity;
 
   return (
     <article className="flex gap-4 border-b border-border py-6">
@@ -28,7 +36,8 @@ export function CartItem({
 
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-primary">
-          {product.category}
+          {product.categories?.name ??
+            "Sin categoría"}
         </p>
 
         <h2 className="mt-1 font-semibold">
@@ -49,7 +58,9 @@ export function CartItem({
       <div className="flex flex-col items-end justify-between">
         <button
           type="button"
-          onClick={() => removeItem(product.id)}
+          onClick={() =>
+            removeItem(product.id)
+          }
           aria-label={`Eliminar ${product.name}`}
           className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
         >
@@ -60,7 +71,10 @@ export function CartItem({
           <button
             type="button"
             onClick={() =>
-              updateQuantity(product.id, quantity - 1)
+              updateQuantity(
+                product.id,
+                quantity - 1,
+              )
             }
             className="p-2 transition-colors hover:bg-muted"
             aria-label="Disminuir cantidad"
@@ -75,7 +89,10 @@ export function CartItem({
           <button
             type="button"
             onClick={() =>
-              updateQuantity(product.id, quantity + 1)
+              updateQuantity(
+                product.id,
+                quantity + 1,
+              )
             }
             className="p-2 transition-colors hover:bg-muted"
             aria-label="Aumentar cantidad"
@@ -83,6 +100,7 @@ export function CartItem({
             <Plus size={15} />
           </button>
         </div>
+
 
         <p className="text-sm font-semibold">
           ${itemTotal.toFixed(2)}

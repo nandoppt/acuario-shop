@@ -1,8 +1,12 @@
 import Link from "next/link";
+
 import { ArrowLeft, Package, Truck } from "lucide-react";
 
-import { getProductBySlug } from "@/lib/catalog/mock-products";
+import { getProductBySlug } from "@/lib/catalog/products";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
+import { ProductGallery } from "@/components/product/product-gallery";
+
+export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
   params: Promise<{
@@ -15,13 +19,16 @@ export default async function ProductPage({
 }: ProductPageProps) {
   const { slug } = await params;
 
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return (
       <main className="mx-auto flex min-h-[70vh] max-w-7xl items-center justify-center px-4">
         <div className="text-center">
-          <Package className="mx-auto text-primary" size={48} />
+          <Package
+            className="mx-auto text-primary"
+            size={48}
+          />
 
           <h1 className="mt-5 text-3xl font-semibold">
             Producto no encontrado
@@ -43,6 +50,15 @@ export default async function ProductPage({
     );
   }
 
+  const stock =
+     product.inventory?.quantity ?? 0;
+
+ const compareAtPrice = product.compare_at_price;
+
+const hasComparePrice =
+  compareAtPrice !== null &&
+  compareAtPrice > product.price;
+
   return (
     <main>
       <section className="mx-auto max-w-7xl px-4 py-10 md:px-8 md:py-16">
@@ -55,25 +71,16 @@ export default async function ProductPage({
         </Link>
 
         <div className="mt-10 grid gap-12 lg:grid-cols-2">
-          {/* Imagen */}
-          <div className="overflow-hidden rounded-3xl border border-border bg-muted">
-            <div className="flex aspect-square flex-col items-center justify-center text-muted-foreground">
-              <Package
-                size={72}
-                strokeWidth={1}
-                className="text-primary/50"
-              />
-
-              <p className="mt-4 text-sm">
-                Imagen próximamente
-              </p>
-            </div>
-          </div>
+          {/* Galería */}
+      <ProductGallery
+        productName={product.name}
+        images={product.images}
+          />
 
           {/* Información */}
           <div className="flex flex-col justify-center">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
-              {product.category}
+              {product.categories?.name ?? "Sin categoría"}
             </p>
 
             <h1 className="mt-3 text-4xl font-semibold tracking-tight md:text-5xl">
@@ -91,9 +98,9 @@ export default async function ProductPage({
                 ${product.price.toFixed(2)}
               </p>
 
-              {product.previousPrice && (
+              {hasComparePrice && (
                 <p className="mt-1 text-sm text-muted-foreground line-through">
-                  ${product.previousPrice.toFixed(2)}
+                  ${compareAtPrice.toFixed(2)}
                 </p>
               )}
             </div>
@@ -101,10 +108,13 @@ export default async function ProductPage({
             <div className="my-8 h-px bg-border" />
 
             <p className="text-base leading-8 text-muted-foreground">
-              {product.description}
+              {product.description ??
+                product.short_description ??
+                ""}
             </p>
 
             <div className="mt-8 space-y-4">
+              {/* Stock */}
               <div className="flex items-center gap-3 rounded-xl border border-border p-4">
                 <Package
                   size={20}
@@ -117,13 +127,14 @@ export default async function ProductPage({
                   </p>
 
                   <p className="text-sm text-muted-foreground">
-                    {product.stock > 0
-                      ? `${product.stock} unidades disponibles`
+                    {stock > 0
+                      ? `${stock} unidades disponibles`
                       : "Agotado"}
                   </p>
                 </div>
               </div>
 
+              {/* Envíos */}
               <div className="flex items-center gap-3 rounded-xl border border-border p-4">
                 <Truck
                   size={20}
@@ -144,7 +155,7 @@ export default async function ProductPage({
 
             <AddToCartButton
               productId={product.id}
-              disabled={product.stock === 0}
+              disabled={stock === 0}
             />
           </div>
         </div>
