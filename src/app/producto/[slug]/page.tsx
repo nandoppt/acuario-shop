@@ -5,7 +5,6 @@ import { ArrowLeft, Package, Truck } from "lucide-react";
 import { getProductBySlug } from "@/lib/catalog/products";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductGallery } from "@/components/product/product-gallery";
-
 export const dynamic = "force-dynamic";
 
 type ProductPageProps = {
@@ -51,9 +50,10 @@ export default async function ProductPage({
   }
 
   const stock =
-     product.inventory?.quantity ?? 0;
+  product.inventory?.quantity ?? 0;
 
- const compareAtPrice = product.compare_at_price;
+const compareAtPrice =
+  product.compare_at_price;
 
 const hasComparePrice =
   compareAtPrice !== null &&

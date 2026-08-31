@@ -1,0 +1,189 @@
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+
+function normalizeSlug(value: string) {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export async function createProduct(formData: FormData) {
+  const supabase = await createClient();
+
+  // Verificar sesión
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    throw new Error("No autenticado.");
+  }
+
+  // Verificar rol
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile?.role !== "admin") {
+    throw new Error("No tienes permisos para crear productos.");
+  }
+
+  const name = String(formData.get("name") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const categoryId = String(
+    formData.get("category_id") ?? "",
+  ).trim();
+
+  const shortDescription = String(
+    formData.get("short_description") ?? "",
+  ).trim();
+
+  const description = String(
+    formData.get("description") ?? "",
+  ).trim();
+
+  const brand = String(
+    formData.get("brand") ?? "",
+  ).trim();
+
+  const sku = String(
+    formData.get("sku") ?? "",
+  ).trim();
+
+  const price = Number(formData.get("price"));
+
+  const compareAtPriceRaw = String(
+    formData.get("compare_at_price") ?? "",
+  ).trim();
+
+  const compareAtPrice = compareAtPriceRaw
+    ? Number(compareAtPriceRaw)
+    : null;
+
+  const stock = Number(formData.get("stock"));
+
+  const isActive =
+    formData.get("is_active") === "on";
+
+  const isFeatured =
+    formData.get("is_featured") === "on";
+
+  const slug = normalizeSlug(
+    slugInput || name,
+  );
+
+  // Validaciones
+  if (!name) {
+    throw new Error("El nombre del producto es obligatorio.");
+  }
+
+  if (!categoryId) {
+    throw new Error("Debes seleccionar una categoría.");
+  }
+
+  if (!slug) {
+    throw new Error("El slug del producto no es válido.");
+  }
+
+  if (!Number.isFinite(price) || price < 0) {
+    throw new Error("El precio no es válido.");
+  }
+
+  if (
+    compareAtPrice !== null &&
+    (!Number.isFinite(compareAtPrice) ||
+      compareAtPrice < 0)
+  ) {
+    throw new Error(
+      "El precio anterior no es válido.",
+    );
+  }
+
+  if (!Number.isInteger(stock) || stock < 0) {
+    throw new Error(
+      "El stock debe ser un número entero mayor o igual a 0.",
+    );
+  }
+
+  // Comprobar slug existente
+  const { data: existingSlug } = await supabase
+    .from("products")
+    .select("id")
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (existingSlug) {
+    throw new Error(
+      `Ya existe un producto con el slug "${slug}".`,
+    );
+  }
+
+  // Crear producto
+  const { data: product, error: productError } =
+    await supabase
+      .from("products")
+      .insert({
+        category_id: categoryId,
+        name,
+        slug,
+        short_description:
+          shortDescription || null,
+        description: description || null,
+        brand: brand || null,
+        sku: sku || null,
+        price,
+        compare_at_price: compareAtPrice,
+        is_active: isActive,
+        is_featured: isFeatured,
+      })
+      .select("id")
+      .single();
+
+  if (productError || !product) {
+    console.error(
+      "Error creando producto:",
+      productError,
+    );
+
+    throw new Error(
+      productError?.message ??
+        "No se pudo crear el producto.",
+    );
+  }
+
+  // Crear inventario
+  const { error: inventoryError } =
+    await supabase
+      .from("inventory")
+      .insert({
+        product_id: product.id,
+        quantity: stock,
+      });
+
+  if (inventoryError) {
+    console.error(
+      "Error creando inventario:",
+      inventoryError,
+    );
+
+    // Intentar limpiar el producto creado
+    await supabase
+      .from("products")
+      .delete()
+      .eq("id", product.id);
+
+    throw new Error(
+      `Producto creado pero no se pudo crear el inventario: ${inventoryError.message}`,
+    );
+  }
+
+  redirect("/admin/productos");
+}
