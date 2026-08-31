@@ -1,5 +1,6 @@
 import { OrderStatusControl } from "../order-status-control";
 import { ConfirmPaymentButton } from "../confirm-payment-button";
+import { CancelOrderButton } from "../cancel-order-button";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -472,36 +473,50 @@ export default async function OrderDetailPage({
             </section>
           )}
 
-          {/* Acción */}
+          {/* Acciones */}
 
-            {payment &&
-                payment.payment_status !== "paid" &&
-                order.status === "pending" && (
-                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
-                <p className="text-sm font-medium">
-                    Este pedido requiere revisión
-                </p>
+{payment &&
+  payment.payment_status !== "paid" &&
+  order.status === "pending" && (
+    <div className="rounded-2xl border border-primary/20 bg-primary/5 p-6">
+      <p className="text-sm font-medium">
+        Este pedido requiere revisión
+      </p>
 
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    Verifica que el pago haya sido recibido
-                    antes de confirmarlo.
-                </p>
+      <p className="mt-2 text-sm leading-6 text-muted-foreground">
+        Verifica que el pago haya sido recibido
+        antes de confirmarlo.
+      </p>
 
-                <div className="mt-5">
-                    <ConfirmPaymentButton
-                    orderId={order.id}
-                    paymentId={payment.id}
-                    />
-                </div>
-                </div>
-            )}
-            {order.status !== "pending" &&
-                order.status !== "cancelled" && (
-                <OrderStatusControl
-                orderId={order.id}
-                currentStatus={order.status}
-                />
-            )}
+      <div className="mt-5 space-y-3">
+        <ConfirmPaymentButton
+          orderId={order.id}
+          paymentId={payment.id}
+        />
+
+        <CancelOrderButton
+          orderId={order.id}
+          orderNumber={order.order_number}
+        />
+      </div>
+    </div>
+  )}
+
+{order.status !== "pending" &&
+  order.status !== "cancelled" &&
+  order.status !== "delivered" && (
+    <>
+      <OrderStatusControl
+        orderId={order.id}
+        currentStatus={order.status}
+      />
+
+      <CancelOrderButton
+        orderId={order.id}
+        orderNumber={order.order_number}
+      />
+    </>
+  )}
         </aside>
       </div>
     </div>

@@ -294,3 +294,100 @@ export async function updateOrderStatus(
     };
   }
 }
+export async function cancelOrder(
+  orderId: string,
+): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  const supabase = await createClient();
+
+  // Verificar sesión
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return {
+      success: false,
+      message: "No estás autenticado.",
+    };
+  }
+
+  // Verificar administrador
+  const { data: profile, error: profileError } =
+    await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+  if (
+    profileError ||
+    profile?.role !== "admin"
+  ) {
+    return {
+      success: false,
+      message:
+        "No tienes permisos para cancelar pedidos.",
+    };
+  }
+
+  if (!orderId) {
+    return {
+      success: false,
+      message: "Falta el pedido.",
+    };
+  }
+
+  try {
+    const adminSupabase =
+      createAdminClient();
+
+    const { data, error } =
+      await adminSupabase.rpc(
+        "cancel_order",
+        {
+          p_order_id: orderId,
+        },
+      );
+
+    if (error) {
+      console.error(
+        "Error cancelando pedido:",
+        error,
+      );
+
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
+
+    if (!data?.success) {
+      return {
+        success: false,
+        message:
+          data?.message ??
+          "No se pudo cancelar el pedido.",
+      };
+    }
+
+    return {
+      success: true,
+      message:
+        "Pedido cancelado correctamente.",
+    };
+  } catch (error) {
+    console.error(
+      "Error inesperado cancelando pedido:",
+      error,
+    );
+
+    return {
+      success: false,
+      message:
+        "Ocurrió un error inesperado.",
+    };
+  }
+}
