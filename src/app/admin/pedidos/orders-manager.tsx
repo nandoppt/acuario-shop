@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-
+import { useMemo, useState } from "react";
 import {
   CheckCircle2,
   Clock3,
@@ -175,6 +175,54 @@ function paymentStatusClass(
 export function OrdersManager({
   orders,
 }: Props) {
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState("all");
+  const [paymentFilter, setPaymentFilter] =
+    useState("all");
+      const filteredOrders = useMemo(() => {
+    const normalizedSearch =
+      search.trim().toLowerCase();
+
+    return orders.filter((order) => {
+      const customer = order.customers;
+
+      const customerName = customer
+        ? `${customer.first_name} ${customer.last_name}`
+        : "";
+
+      const matchesSearch =
+        !normalizedSearch ||
+        String(order.order_number)
+          .includes(normalizedSearch) ||
+        customerName
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        (customer?.email ?? "")
+          .toLowerCase()
+          .includes(normalizedSearch);
+
+      const matchesStatus =
+        statusFilter === "all" ||
+        order.status === statusFilter;
+
+      const matchesPayment =
+        paymentFilter === "all" ||
+        order.payments?.payment_status ===
+          paymentFilter;
+
+      return (
+        matchesSearch &&
+        matchesStatus &&
+        matchesPayment
+      );
+    });
+  }, [
+    orders,
+    search,
+    statusFilter,
+    paymentFilter,
+  ]);
   const pendingOrders =
     orders.filter(
       (order) =>
@@ -257,8 +305,139 @@ export function OrdersManager({
       </div>
 
       {/* Pedidos */}
+      {/* Filtros */}
 
-      {orders.length === 0 ? (
+      {orders.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="grid gap-4 lg:grid-cols-[1fr_220px_220px_auto]">
+            <div>
+              <label
+                htmlFor="order-search"
+                className="mb-2 block text-sm font-medium"
+              >
+                Buscar pedido
+              </label>
+
+              <input
+                id="order-search"
+                type="search"
+                value={search}
+                onChange={(event) =>
+                  setSearch(event.target.value)
+                }
+                placeholder="Número, cliente o correo..."
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="order-status"
+                className="mb-2 block text-sm font-medium"
+              >
+                Estado del pedido
+              </label>
+
+              <select
+                id="order-status"
+                value={statusFilter}
+                onChange={(event) =>
+                  setStatusFilter(event.target.value)
+                }
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+              >
+                <option value="all">
+                  Todos
+                </option>
+                <option value="pending">
+                  Pendientes
+                </option>
+                <option value="confirmed">
+                  Confirmados
+                </option>
+                <option value="preparing">
+                  Preparando
+                </option>
+                <option value="shipped">
+                  Enviados
+                </option>
+                <option value="delivered">
+                  Entregados
+                </option>
+                <option value="cancelled">
+                  Cancelados
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label
+                htmlFor="payment-status"
+                className="mb-2 block text-sm font-medium"
+              >
+                Estado del pago
+              </label>
+
+              <select
+                id="payment-status"
+                value={paymentFilter}
+                onChange={(event) =>
+                  setPaymentFilter(event.target.value)
+                }
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+              >
+                <option value="all">
+                  Todos
+                </option>
+                <option value="pending">
+                  Pendientes
+                </option>
+                <option value="waiting_verification">
+                  Por verificar
+                </option>
+                <option value="paid">
+                  Pagados
+                </option>
+                <option value="rejected">
+                  Rechazados
+                </option>
+                <option value="refunded">
+                  Reembolsados
+                </option>
+              </select>
+            </div>
+
+            <div className="flex items-end">
+              <button
+                type="button"
+                onClick={() => {
+                  setSearch("");
+                  setStatusFilter("all");
+                  setPaymentFilter("all");
+                }}
+                className="w-full rounded-xl border border-border px-4 py-3 text-sm font-medium transition hover:bg-muted"
+              >
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+            <span>
+              Mostrando{" "}
+              <strong className="text-foreground">
+                {filteredOrders.length}
+              </strong>{" "}
+              de{" "}
+              <strong className="text-foreground">
+                {orders.length}
+              </strong>{" "}
+              pedidos
+            </span>
+          </div>
+        </div>
+      )}
+        {orders.length === 0 ? (
         <div className="rounded-2xl border border-border bg-card p-10 text-center">
           <Package
             className="mx-auto text-primary"
@@ -274,9 +453,37 @@ export function OrdersManager({
             tienda aparecerán aquí.
           </p>
         </div>
+      ) : filteredOrders.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+          <Package
+            className="mx-auto text-muted-foreground"
+            size={40}
+          />
+
+          <h2 className="mt-4 text-xl font-semibold">
+            No encontramos pedidos
+          </h2>
+
+          <p className="mt-2 text-sm text-muted-foreground">
+            Prueba con otro término de búsqueda
+            o cambia los filtros.
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSearch("");
+              setStatusFilter("all");
+              setPaymentFilter("all");
+            }}
+            className="mt-6 rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            Limpiar filtros
+          </button>
+        </div>
       ) : (
         <div className="space-y-4">
-          {orders.map((order) => {
+          {filteredOrders.map((order) => {
             const customer =
               order.customers;
 

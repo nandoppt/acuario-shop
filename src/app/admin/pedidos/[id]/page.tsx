@@ -55,12 +55,20 @@ export default async function OrderDetailPage({
         ),
 
         order_items (
-          id,
-          product_name,
-          unit_price,
-          quantity,
-          subtotal
-        ),
+            id,
+            product_id,
+            product_name,
+            unit_price,
+            quantity,
+            subtotal,
+            products (
+              id,
+              name,
+              inventory (
+                quantity
+              )
+            )
+          ),
 
         payments (
           id,
@@ -115,6 +123,25 @@ export default async function OrderDetailPage({
   const payment = Array.isArray(order.payments)
     ? order.payments[0] ?? null
     : order.payments;
+
+  const orderItems = (order.order_items ?? []).map(
+  (item) => {
+    const product = Array.isArray(item.products)
+      ? item.products[0] ?? null
+      : item.products;
+
+    const inventory = product?.inventory;
+
+    const stock = Array.isArray(inventory)
+      ? inventory[0]?.quantity ?? null
+      : inventory?.quantity ?? null;
+
+    return {
+      ...item,
+      stock,
+    };
+  },
+);
 
   const paymentMethods: Record<
     string,
@@ -221,34 +248,70 @@ export default async function OrderDetailPage({
             </div>
 
             <div className="divide-y divide-border">
-              {order.order_items.map(
-                (item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center justify-between gap-4 p-6"
-                  >
-                    <div>
-                      <p className="font-medium">
-                        {item.product_name}
-                      </p>
+              {orderItems.map((item) => {
+  const hasStock =
+    item.stock !== null &&
+    item.stock >= item.quantity;
 
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {item.quantity} × $
-                        {Number(
-                          item.unit_price,
-                        ).toFixed(2)}
-                      </p>
-                    </div>
+  return (
+    <div
+      key={item.id}
+      className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <div className="min-w-0">
+        <p className="font-medium">
+          {item.product_name}
+        </p>
 
-                    <p className="font-semibold">
-                      $
-                      {Number(
-                        item.subtotal,
-                      ).toFixed(2)}
-                    </p>
-                  </div>
-                ),
-              )}
+        <p className="mt-1 text-sm text-muted-foreground">
+          {item.quantity} × $
+          {Number(item.unit_price).toFixed(2)}
+        </p>
+
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-muted-foreground">
+            Stock actual:
+          </span>
+
+          {item.stock === null ? (
+            <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-medium">
+              No disponible
+            </span>
+          ) : (
+            <span
+              className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+                hasStock
+                  ? "bg-primary/10 text-primary"
+                  : "bg-destructive/10 text-destructive"
+              }`}
+            >
+              {item.stock} unidades
+            </span>
+          )}
+
+          {item.stock !== null && (
+            <span
+              className={`text-xs ${
+                hasStock
+                  ? "text-muted-foreground"
+                  : "font-medium text-destructive"
+              }`}
+            >
+              {hasStock
+                ? "✓ Stock suficiente"
+                : "⚠ Stock insuficiente"}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <p className="shrink-0 font-semibold">
+        $
+        {Number(item.subtotal).toFixed(2)}
+      </p>
+    </div>
+  );
+})}
             </div>
 
             <div className="space-y-3 border-t border-border p-6 text-sm">
