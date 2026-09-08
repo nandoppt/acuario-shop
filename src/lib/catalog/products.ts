@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
-import type { CatalogProduct } from "@/types/catalog";
+import type {
+  CatalogProduct,
+  ProductCategory,
+} from "@/types/catalog";
 
 const BUCKET_NAME = "product-images";
 
@@ -106,4 +109,26 @@ export async function getProductBySlug(
     data as unknown as CatalogProduct,
     supabase,
   );
+}
+export async function getCategories(): Promise<ProductCategory[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("categories")
+    .select(`
+      id,
+      name,
+      slug
+    `)
+    .order("name", {
+      ascending: true,
+    });
+
+  if (error) {
+    throw new Error(
+      `No se pudieron cargar las categorías: ${error.message}`,
+    );
+  }
+
+  return (data ?? []) as ProductCategory[];
 }
