@@ -1,3 +1,4 @@
+import { TrackingCodeActions } from "@/components/orders/tracking-code-actions";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -60,7 +61,7 @@ export default async function PedidoConfirmadoPage({
           )
         `,
       )
-      .eq("id", id)
+      .eq("tracking_token", id)
       .single();
 
   if (!order) {
@@ -144,6 +145,27 @@ export default async function PedidoConfirmadoPage({
           Hemos recibido correctamente tu pedido.
         </p>
       </div>
+      <div className="mt-6 rounded-lg border bg-muted/30 p-4">
+  <p className="text-sm font-medium">
+    Guarda tu código de seguimiento
+  </p>
+
+  <p className="mt-1 text-sm text-muted-foreground">
+    Lo necesitarás para consultar el estado de tu pedido
+    más adelante.
+  </p>
+
+  <div className="mt-4 rounded-md border bg-background px-4 py-3">
+    <p className="text-xs text-muted-foreground">
+      Código de seguimiento
+    </p>
+
+    <p className="mt-1 break-all font-mono text-sm">
+      {id}
+    </p>
+    <TrackingCodeActions trackingToken={id} />
+  </div>
+</div>
 
       {/* Número de pedido */}
 

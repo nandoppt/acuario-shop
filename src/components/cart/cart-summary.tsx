@@ -5,7 +5,13 @@ import { ArrowRight } from "lucide-react";
 
 import { useCart } from "@/components/cart/cart-context";
 
-export function CartSummary() {
+type CartSummaryProps = {
+  checkout?: boolean;
+};
+
+export function CartSummary({
+  checkout = false,
+}: CartSummaryProps) {
   const { subtotal, itemCount } = useCart();
 
   return (
@@ -45,10 +51,13 @@ export function CartSummary() {
       </div>
 
       <Link
-        href="/checkout"
+        href={checkout ? "/tienda" : "/checkout"}
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-medium text-primary-foreground transition hover:-translate-y-0.5 hover:opacity-90"
       >
-        Continuar compra
+        {checkout
+          ? "Continuar comprando"
+          : "Continuar compra"}
+
         <ArrowRight size={18} />
       </Link>
 

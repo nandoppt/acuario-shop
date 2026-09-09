@@ -369,8 +369,7 @@ export function CheckoutForm() {
         {/* Resumen */}
 
         <div>
-          <CartSummary />
-
+          <CartSummary checkout />
           <button
             type="submit"
             disabled={loading}

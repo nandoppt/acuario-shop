@@ -98,7 +98,7 @@ export function CheckoutForm() {
       );
 
       router.push(
-        `/pedido/confirmado/${result.order.order_id}`,
+       `/pedido/confirmado/${result.order.tracking_token}`,
       );
     } catch (error) {
       console.error(
@@ -351,7 +351,7 @@ export function CheckoutForm() {
         {/* Resumen */}
 
         <div>
-          <CartSummary />
+          <CartSummary checkout />
 
           <button
             type="submit"

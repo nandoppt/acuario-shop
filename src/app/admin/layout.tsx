@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { LogoutButton } from "@/components/auth/logout-button";
 import { redirect } from "next/navigation";
 import {
   LayoutDashboard,
@@ -130,6 +131,9 @@ export default async function AdminLayout({
                 <Store size={18} />
                 Ver tienda
               </Link>
+              <LogoutButton
+                className="mt-1 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              />
             </div>
           </div>
         </aside>

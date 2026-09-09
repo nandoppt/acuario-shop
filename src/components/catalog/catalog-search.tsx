@@ -17,12 +17,14 @@ type CatalogSearchProps = {
   products: CatalogProduct[];
   value?: string;
   selectedCategory?: string;
+  compact?: boolean;
 };
 
 export function CatalogSearch({
   products,
   value = "",
   selectedCategory,
+  compact = false,
 }: CatalogSearchProps) {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -212,14 +214,18 @@ export function CatalogSearch({
 
   return (
     <div
-      ref={containerRef}
-      className="relative max-w-3xl"
-    >
+        ref={containerRef}
+        className={`relative ${
+          compact ? "w-full" : "max-w-3xl"
+        }`}
+     >
       <form onSubmit={handleSubmit}>
         <div className="relative">
-          <Search
-            size={18}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+        <Search
+          size={compact ? 17 : 18}
+          className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground ${
+            compact ? "left-3" : "left-3"
+          }`}
           />
 
           <input
@@ -235,8 +241,11 @@ export function CatalogSearch({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Buscar plantas, filtros, iluminación..."
-            className="h-10 w-full rounded-xl border border-border bg-background pl-10 pr-10 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10"
-            aria-label="Buscar productos"
+            className={`w-full border border-border bg-background text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 ${
+              compact
+                ? "h-9 rounded-full pl-9 pr-9"
+                : "h-10 rounded-xl pl-10 pr-10"
+            }`}            aria-label="Buscar productos"
             aria-autocomplete="list"
             aria-expanded={
               isOpen && suggestions.length > 0

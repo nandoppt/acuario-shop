@@ -1,5 +1,6 @@
 "use server";
 
+import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type CheckoutItem = {
@@ -36,28 +37,56 @@ export async function createPendingOrder(
       };
     }
 
-    const supabase = createAdminClient();
+    /*
+     * Cliente de servidor:
+     * permite conocer al usuario autenticado
+     * mediante las cookies de Supabase.
+     */
+    const supabase = await createClient();
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    /*
+     * Cliente administrativo:
+     * lo conservamos para ejecutar el RPC actual,
+     * que únicamente permite EXECUTE a service_role.
+     */
+    const admin = createAdminClient();
+
+    /*
+     * Por ahora solo obtenemos la identidad.
+     * En el siguiente paso la enviaremos al RPC.
+     */
+    const authUserId = user?.id ?? null;
+
+    console.log(
+      "[CHECKOUT] authUserId:",
+      authUserId,
+    );
 
     const { data, error } =
-      await supabase.rpc(
-        "create_pending_order",
-        {
-          p_first_name: input.first_name,
-          p_last_name: input.last_name,
-          p_email: input.email,
-          p_phone: input.phone,
-          p_province: input.province,
-          p_city: input.city,
-          p_address: input.address,
-          p_reference: input.reference,
-          p_items: input.items,
-          p_payment_method:
-            input.payment_method,
-          p_shipping_cost:
-            input.shipping_cost,
-          p_notes: input.notes,
-        },
-      );
+  await admin.rpc(
+    "create_pending_order",
+    {
+      p_first_name: input.first_name,
+      p_last_name: input.last_name,
+      p_email: input.email,
+      p_phone: input.phone,
+      p_province: input.province,
+      p_city: input.city,
+      p_address: input.address,
+      p_reference: input.reference,
+      p_items: input.items,
+      p_payment_method:
+        input.payment_method,
+      p_shipping_cost:
+        input.shipping_cost,
+      p_notes: input.notes,
+      p_auth_user_id: authUserId,
+    },
+  );
 
     if (error) {
       console.error(
