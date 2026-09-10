@@ -4,7 +4,18 @@ import { OrdersManager } from "./orders-manager";
 
 export const dynamic = "force-dynamic";
 
-export default async function OrdersPage() {
+type SearchParams = {
+  status?: string;
+  payment?: string;
+};
+
+export default async function OrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const params = await searchParams;
+  
   const supabase = await createClient();
 
   const { data: orders, error } =
@@ -94,6 +105,8 @@ export default async function OrdersPage() {
 
       <OrdersManager
         orders={normalizedOrders}
+        initialStatusFilter={params.status ?? "all"}
+        initialPaymentFilter={params.payment ?? "all"}
       />
     </div>
   );
