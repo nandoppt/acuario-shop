@@ -1,18 +1,15 @@
 "use client";
 
+import { TrackedOrderDetails } from "./tracked-order-details";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
 import {
   ArrowLeft,
-  Check,
-  Clock3,
+  ChevronDown,
   Loader2,
   Package,
   Search,
-  Truck,
-  XCircle,
 } from "lucide-react";
-
 import {
   getOrderByTrackingToken,
   requestOrderVerificationCode,
@@ -101,18 +98,6 @@ function formatDate(value: string) {
     dateStyle: "long",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function getRelation<T>(
-  relation: T | T[] | null | undefined,
-): T | null {
-  if (!relation) {
-    return null;
-  }
-
-  return Array.isArray(relation)
-    ? relation[0] ?? null
-    : relation;
 }
 
 export default function OrderTrackingPage() {
@@ -288,37 +273,6 @@ const handleVerificationSubmit = async (
     setSelectedOrderId(orders[0].id);
   }
 };
-
-  const selectedCustomerOrder =
-  customerOrders.find(
-    (customerOrder) =>
-      customerOrder.id === selectedOrderId,
-  ) ?? null;
-
-  const order =
-    result?.success
-      ? result.order
-      : selectedCustomerOrder;
-
-  const customer = order
-    ? getRelation(order.customers)
-    : null;
-
-  const address = order
-    ? getRelation(order.addresses)
-    : null;
-
-  const payment = order
-    ? getRelation(order.payments)
-    : null;
-
-  const currentStatus =
-    order?.status ?? null;
-
-  const currentStatusIndex =
-    currentStatus
-      ? statusOrder.indexOf(currentStatus)
-      : -1;
 
   return (
     <main className="min-h-screen bg-background">
@@ -601,370 +555,115 @@ const handleVerificationSubmit = async (
               </p>
 
               <div className="mt-5 divide-y">
-                {customerOrders.map(
-                  (customerOrder) => (
-                    <button
-                      key={customerOrder.id}
-                      type="button"
-                      onClick={() =>
-                        setSelectedOrderId(
-                          customerOrder.id,
-                        )
-                      }
-                      className={[
-                        "flex w-full items-center justify-between gap-4 py-4 text-left transition",
-                        selectedOrderId ===
-                        customerOrder.id
-                          ? "bg-muted/50"
-                          : "hover:bg-muted/30",
-                      ].join(" ")}
-                    >
-                      <div>
-                        <p className="font-medium">
-                          Pedido #
-                          {String(
-                            customerOrder.order_number,
-                          ).padStart(4, "0")}
-                        </p>
+                {customerOrders.length > 0 && (
+  <div className="mt-8 rounded-xl border bg-card shadow-sm">
+    <div className="border-b px-6 py-5">
+      <h2 className="text-lg font-semibold">
+        {customerOrders.length === 1
+          ? "Pedido encontrado"
+          : "Pedidos encontrados"}
+      </h2>
 
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {formatDate(
-                            customerOrder.created_at,
-                          )}
-                        </p>
-                      </div>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {customerOrders.length === 1
+          ? "Consulta la información de tu pedido."
+          : "Selecciona el pedido que deseas consultar."}
+      </p>
+    </div>
 
-                      <div className="text-right">
-                        <p className="font-medium">
-                          {formatCurrency(
-                            customerOrder.total,
-                          )}
-                        </p>
+    <div className="divide-y">
+      {customerOrders.map(
+        (customerOrder) => {
+          const isOpen =
+            selectedOrderId ===
+            customerOrder.id;
 
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {statusLabels[
-                            customerOrder.status
-                          ] ??
-                            customerOrder.status}
-                        </p>
-                      </div>
-                    </button>
-                  ),
-                )}
-              </div>
-            </div>
-          )}
+          return (
+            <div
+              key={customerOrder.id}
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setSelectedOrderId(
+                    isOpen
+                      ? null
+                      : customerOrder.id,
+                  )
+                }
+                aria-expanded={isOpen}
+                className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-muted/30 md:px-6"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-semibold">
+                      Pedido #
+                      {String(
+                        customerOrder.order_number,
+                      ).padStart(4, "0")}
+                    </p>
 
-        {order && (
-          <div className="mt-8 space-y-6">
-            <div className="rounded-xl border bg-card p-6 shadow-sm">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Pedido
-                  </p>
-
-                  <h2 className="text-2xl font-semibold">
-                    #
-                    {String(
-                      order.order_number,
-                    ).padStart(4, "0")}
-                  </h2>
+                    <span className="rounded-full border px-2.5 py-1 text-xs font-medium">
+                      {statusLabels[
+                        customerOrder.status
+                      ] ??
+                        customerOrder.status}
+                    </span>
+                  </div>
 
                   <p className="mt-1 text-sm text-muted-foreground">
                     {formatDate(
-                      order.created_at,
+                      customerOrder.created_at,
                     )}
                   </p>
                 </div>
 
-                <div className="rounded-full border px-4 py-2 text-sm font-medium">
-                  {statusLabels[
-                    order.status
-                  ] ?? order.status}
+                <div className="flex shrink-0 items-center gap-4">
+                  <p className="font-semibold">
+                    {formatCurrency(
+                      customerOrder.total,
+                    )}
+                  </p>
+
+                  <ChevronDown
+                    className={[
+                      "h-5 w-5 text-muted-foreground transition-transform duration-200",
+                      isOpen
+                        ? "rotate-180"
+                        : "",
+                    ].join(" ")}
+                  />
                 </div>
+              </button>
+
+              {isOpen && (
+                <TrackedOrderDetails
+                  order={customerOrder}
+                  statusLabels={
+                    statusLabels
+                  }
+                  paymentLabels={
+                    paymentLabels
+                  }
+                  paymentStatusLabels={
+                    paymentStatusLabels
+                  }
+                  timeline={timeline}
+                  statusOrder={
+                    statusOrder
+                  }
+                />
+              )}
+            </div>
+          );
+        },
+      )}
+    </div>
+  </div>
+)}
               </div>
             </div>
-
-            {order.status === "cancelled" ? (
-              <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
-                <div className="flex items-start gap-3">
-                  <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
-
-                  <div>
-                    <h3 className="font-semibold">
-                      Pedido cancelado
-                    </h3>
-
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      Este pedido ya no continuará
-                      con el proceso de preparación
-                      y entrega.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <h3 className="text-lg font-semibold">
-                  Estado del pedido
-                </h3>
-
-                <div className="mt-6 space-y-6">
-                  {timeline.map(
-                    (step, index) => {
-                      const stepIndex =
-                        statusOrder.indexOf(
-                          step.status,
-                        );
-
-                      const completed =
-                        currentStatusIndex >=
-                        stepIndex;
-
-                      const current =
-                        currentStatus ===
-                        step.status;
-
-                      return (
-                        <div
-                          key={step.status}
-                          className="flex gap-4"
-                        >
-                          <div className="flex flex-col items-center">
-                            <div
-                              className={[
-                                "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border",
-                                completed
-                                  ? "bg-primary text-primary-foreground"
-                                  : "bg-background text-muted-foreground",
-                              ].join(" ")}
-                            >
-                              {completed ? (
-                                <Check className="h-4 w-4" />
-                              ) : (
-                                <Clock3 className="h-4 w-4" />
-                              )}
-                            </div>
-
-                            {index <
-                              timeline.length -
-                                1 && (
-                              <div
-                                className={[
-                                  "mt-2 h-8 w-px",
-                                  currentStatusIndex >
-                                  stepIndex
-                                    ? "bg-primary"
-                                    : "bg-border",
-                                ].join(" ")}
-                              />
-                            )}
-                          </div>
-
-                          <div className="pb-2">
-                            <p
-                              className={[
-                                "font-medium",
-                                current
-                                  ? "text-foreground"
-                                  : completed
-                                    ? "text-foreground"
-                                    : "text-muted-foreground",
-                              ].join(" ")}
-                            >
-                              {step.label}
-                            </p>
-
-                            <p className="mt-1 text-sm text-muted-foreground">
-                              {step.description}
-                            </p>
-
-                            {current && (
-                              <p className="mt-2 text-xs font-medium text-muted-foreground">
-                                Estado actual
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    },
-                  )}
-                </div>
-              </div>
-            )}
-
-            <div className="rounded-xl border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2">
-                <Truck className="h-5 w-5" />
-
-                <h3 className="text-lg font-semibold">
-                  Resumen del pedido
-                </h3>
-              </div>
-
-              <div className="mt-5 divide-y">
-                {order.order_items.map(
-                  (item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between gap-4 py-4"
-                    >
-                      <div>
-                        <p className="font-medium">
-                          {item.product_name}
-                        </p>
-
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {item.quantity} ×{" "}
-                          {formatCurrency(
-                            item.unit_price,
-                          )}
-                        </p>
-                      </div>
-
-                      <p className="font-medium">
-                        {formatCurrency(
-                          item.subtotal,
-                        )}
-                      </p>
-                    </div>
-                  ),
-                )}
-              </div>
-
-              <div className="mt-4 space-y-2 border-t pt-4 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Subtotal
-                  </span>
-
-                  <span>
-                    {formatCurrency(
-                      order.subtotal,
-                    )}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">
-                    Envío
-                  </span>
-
-                  <span>
-                    {order.shipping_cost ===
-                    0
-                      ? "Gratis"
-                      : formatCurrency(
-                          order.shipping_cost,
-                        )}
-                  </span>
-                </div>
-
-                <div className="flex justify-between pt-2 text-base font-semibold">
-                  <span>Total</span>
-
-                  <span>
-                    {formatCurrency(
-                      order.total,
-                    )}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {payment && (
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <h3 className="text-lg font-semibold">
-                  Información de pago
-                </h3>
-
-                <div className="mt-4 space-y-3 text-sm">
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      Método
-                    </span>
-
-                    <span className="text-right">
-                      {paymentLabels[
-                        payment.payment_method
-                      ] ??
-                        payment.payment_method}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      Estado
-                    </span>
-
-                    <span className="text-right font-medium">
-                      {paymentStatusLabels[
-                        payment.payment_status
-                      ] ??
-                        payment.payment_status}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between gap-4">
-                    <span className="text-muted-foreground">
-                      Monto
-                    </span>
-
-                    <span>
-                      {formatCurrency(
-                        payment.amount,
-                      )}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {customer && address && (
-              <div className="rounded-xl border bg-card p-6 shadow-sm">
-                <h3 className="text-lg font-semibold">
-                  Datos de entrega
-                </h3>
-
-                <div className="mt-4 space-y-1 text-sm">
-                  <p className="font-medium">
-                    {customer.first_name}{" "}
-                    {customer.last_name}
-                  </p>
-
-                  <p className="text-muted-foreground">
-                    {customer.email}
-                  </p>
-
-                  {customer.phone && (
-                    <p className="text-muted-foreground">
-                      {customer.phone}
-                    </p>
-                  )}
-
-                  <div className="pt-3">
-                    <p>
-                      {address.address}
-                    </p>
-
-                    <p className="text-muted-foreground">
-                      {address.city},{" "}
-                      {address.province}
-                    </p>
-
-                    {address.reference && (
-                      <p className="mt-1 text-muted-foreground">
-                        Referencia:{" "}
-                        {address.reference}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
         <div className="mt-8 flex justify-center">
           <Link

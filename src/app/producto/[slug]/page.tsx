@@ -155,6 +155,7 @@ const hasComparePrice =
 
             <AddToCartButton
               productId={product.id}
+              productName={product.name}
               disabled={stock === 0}
             />
           </div>

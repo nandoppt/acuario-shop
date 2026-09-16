@@ -5,11 +5,11 @@ import Link from "next/link";
 import {
   Menu,
   Search,
-  User,
   X,
 } from "lucide-react";
 
 import { CartButton } from "@/components/cart/cart-button";
+import { AccountMenu } from "@/components/account/account-menu";
 import { CatalogSearch } from "@/components/catalog/catalog-search";
 import type { CatalogProduct } from "@/types/catalog";
 
@@ -118,13 +118,7 @@ export function Navbar() {
   )}
 </button>
 
-            <Link
-              href="/cuenta"
-              className="rounded-full p-2 transition-colors hover:bg-muted"
-              aria-label="Mi cuenta"
-            >
-              <User size={20} />
-            </Link>
+            <AccountMenu />
 
             <CartButton />
 

@@ -33,11 +33,11 @@ export default function AccountLoginPage() {
 
         <div className="mt-6 text-center">
           <Link
-            href="/cuenta"
+            href="/tienda"
             className="inline-flex items-center gap-2 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
             <ArrowLeft className="h-4 w-4" />
-            Volver a Mi cuenta
+            Volver a la tienda
           </Link>
         </div>
       </div>
