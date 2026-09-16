@@ -81,25 +81,26 @@ export default async function TiendaPage({
         </div>
       </section>
 
-      <section className="border-b border-border px-4 py-4 md:px-8">
-        <div className="mx-auto max-w-7xl">
-          <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              searchTerm={params.busqueda}
-            />
-          <div className="mt-4">
-          <CatalogSearch
-            products={products}
-            value={params.busqueda}
-            selectedCategory={selectedCategory}
-          />
-          </div>
-        </div>
-      </section>
+      <section className="border-b border-border">
+  <div className="mx-auto max-w-7xl px-4 py-4 md:px-8">
+    <CategoryFilter
+      categories={categories}
+      selectedCategory={selectedCategory}
+      searchTerm={params.busqueda}
+    />
 
-      <section className="px-4 py-10 md:px-8 md:py-14">
-        <div className="mx-auto max-w-7xl">
+    <div className="mt-4">
+      <CatalogSearch
+        products={products}
+        value={params.busqueda}
+        selectedCategory={selectedCategory}
+      />
+    </div>
+  </div>
+</section>
+
+      <section className="py-10 md:py-14">
+  <div className="mx-auto max-w-7xl px-4 md:px-8">
           <div className="mb-8">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
               Catálogo

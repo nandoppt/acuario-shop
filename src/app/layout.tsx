@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import {
+  Cormorant_Garamond,
+  Manrope,
+} from "next/font/google";
 
 import "./globals.css";
 
@@ -7,10 +10,22 @@ import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { CartProvider } from "@/components/cart/cart-context";
 
-const inter = Inter({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-manrope",
   display: "swap",
+});
+
+const cormorant = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-cormorant",
+  display: "swap",
+  weight: [
+    "400",
+    "500",
+    "600",
+    "700",
+  ],
 });
 
 export const metadata: Metadata = {
@@ -30,8 +45,8 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-  className={`${inter.variable} min-h-screen bg-background text-foreground antialiased`}
->
+className={`${manrope.variable} ${cormorant.variable} min-h-screen bg-background text-foreground antialiased`}>
+  
   <CartProvider>
     <Navbar />
     <main>{children}</main>

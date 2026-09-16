@@ -1,8 +1,10 @@
+
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft, Package } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import { OrdersAccordion } from "./orders-accordion";
 
 export default async function OrdersPage() {
   const supabase = await createClient();
@@ -136,91 +138,15 @@ export default async function OrdersPage() {
             </Link>
           </div>
         ) : (
-          <div className="mt-10 space-y-5">
-            {orders.map((order) => (
-              <article
-                key={order.id}
-                className="rounded-2xl border bg-card p-6 shadow-sm"
-              >
-                <div className="flex flex-col gap-3 border-b pb-5 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Pedido #{order.order_number}
-                    </p>
-
-                    <p className="mt-1 text-sm">
-                      {new Date(order.created_at).toLocaleDateString(
-                        "es-EC",
-                        {
-                          day: "2-digit",
-                          month: "long",
-                          year: "numeric",
-                        },
-                      )}
-                    </p>
-                  </div>
-
-                  <span className="inline-flex w-fit rounded-full border px-3 py-1 text-xs font-medium capitalize">
-                    {order.status}
-                  </span>
-                </div>
-
-                <div className="divide-y">
-                  {order.order_items?.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between gap-4 py-4"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-medium">
-                          {item.product_name}
-                        </p>
-
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {item.quantity} × $
-                          {Number(item.unit_price).toFixed(2)}
-                        </p>
-                      </div>
-
-                      <p className="shrink-0 text-sm font-medium">
-                        ${Number(item.subtotal).toFixed(2)}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-5 border-t pt-5">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Subtotal
-                    </span>
-                    <span>
-                      ${Number(order.subtotal).toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="mt-2 flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      Envío
-                    </span>
-                    <span>
-                      ${Number(order.shipping_cost).toFixed(2)}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between border-t pt-4">
-                    <span className="font-semibold">
-                      Total
-                    </span>
-
-                    <span className="text-lg font-semibold">
-                      ${Number(order.total).toFixed(2)}
-                    </span>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+          <OrdersAccordion
+  orders={(orders ?? []).map((order) => ({
+    ...order,
+    subtotal: Number(order.subtotal),
+    shipping_cost: Number(order.shipping_cost),
+    total: Number(order.total),
+    order_items: order.order_items ?? [],
+  }))}
+/>
         )}
 
         <div className="mt-8 text-center">

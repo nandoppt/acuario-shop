@@ -77,10 +77,6 @@ export function Navbar() {
               Tienda
             </Link>
 
-            <Link href="/tienda?categoria=plantas">
-              Plantas
-            </Link>
-
             <Link href="/guias">
               Guías
             </Link>
@@ -175,15 +171,7 @@ export function Navbar() {
                 Tienda
               </Link>
 
-              <Link
-                href="/tienda?categoria=plantas"
-                onClick={() =>
-                  setMobileMenuOpen(false)
-                }
-                className="rounded-lg px-3 py-2 hover:bg-muted"
-              >
-                Plantas
-              </Link>
+             
 
               <Link
                 href="/guias"

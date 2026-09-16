@@ -28,11 +28,43 @@ export function CartItem({
 
   return (
     <article className="flex gap-4 border-b border-border py-6">
-      <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-xl bg-muted">
-        <span className="text-xs text-muted-foreground">
-          Sin imagen
-        </span>
-      </div>
+
+      <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-muted">
+  {(() => {
+    const primaryImage =
+      product.images
+        ?.filter((image) => image.is_primary)
+        .sort(
+          (a, b) => a.sort_order - b.sort_order,
+        )[0] ??
+      product.images
+        ?.slice()
+        .sort(
+          (a, b) => a.sort_order - b.sort_order,
+        )[0];
+
+    if (!primaryImage) {
+      return (
+        <div className="flex h-full w-full items-center justify-center">
+          <span className="text-xs text-muted-foreground">
+            Sin imagen
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <img
+        src={primaryImage.url}
+        alt={
+          primaryImage.alt_text ??
+          product.name
+        }
+        className="h-full w-full object-contain p-2"
+      />
+    );
+  })()}
+</div>
 
       <div className="min-w-0 flex-1">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-primary">
