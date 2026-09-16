@@ -33,8 +33,7 @@ export function ProductCard({
       )[0];
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">
-      <Link href={`/producto/${product.slug}`}>
+<article className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card transition duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-primary/5">      <Link href={`/producto/${product.slug}`}>
         <div className="relative aspect-square overflow-hidden bg-muted">
           {primaryImage ? (
             <img
@@ -67,7 +66,7 @@ export function ProductCard({
         </div>
       </Link>
 
-      <div className="p-5">
+      <div className="flex flex-1 flex-col p-5">
         <p className="text-xs font-medium uppercase tracking-[0.15em] text-primary">
           {product.categories?.name ??
             "Sin categoría"}
@@ -79,13 +78,13 @@ export function ProductCard({
           </h2>
         </Link>
 
-        <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-          {product.short_description ??
+        <p className="mt-2 min-h-12 line-clamp-2 text-sm leading-6 text-muted-foreground">
+            {product.short_description ??
             product.description ??
             ""}
         </p>
 
-        <div className="mt-5 flex items-end justify-between gap-4">
+        <div className="mt-5 flex min-h-14 items-end justify-between gap-4">
           <div>
             {hasDiscount && (
               <p className="text-sm text-muted-foreground line-through">

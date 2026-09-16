@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "@/components/auth/logout-button";
-import { ArrowLeft, LogIn, Package, UserPlus } from "lucide-react";
+import {
+  ArrowLeft,
+  LogIn,
+  Package,
+  UserPlus,
+  UserRound,
+} from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
 
@@ -43,6 +49,7 @@ export default async function AccountPage() {
           </div>
 
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            
             <Link
               href="/cuenta/pedidos"
               className="rounded-xl border bg-card p-6 shadow-sm transition hover:bg-muted/50"
@@ -56,6 +63,20 @@ export default async function AccountPage() {
               <p className="mt-1 text-sm text-muted-foreground">
                 Consulta tu historial de compras y el estado de
                 tus pedidos.
+              </p>
+            </Link>
+            <Link
+              href="/cuenta/datos"
+              className="rounded-xl border bg-card p-6 shadow-sm transition hover:bg-muted/50"
+            >
+              <UserRound className="h-6 w-6" />
+
+              <h2 className="mt-4 font-semibold">
+                Mis datos
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Actualiza tu nombre, apellido y número de teléfono.
               </p>
             </Link>
           </div>
