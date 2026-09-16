@@ -4,6 +4,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import {
   ArrowLeft,
   LogIn,
+  MapPin,
   Package,
   UserPlus,
   UserRound,
@@ -77,6 +78,20 @@ export default async function AccountPage() {
 
               <p className="mt-1 text-sm text-muted-foreground">
                 Actualiza tu nombre, apellido y número de teléfono.
+              </p>
+            </Link>
+            <Link
+              href="/cuenta/direcciones"
+              className="rounded-xl border bg-card p-6 shadow-sm transition hover:bg-muted/50"
+            >
+              <MapPin className="h-6 w-6" />
+
+              <h2 className="mt-4 font-semibold">
+                Mis direcciones
+              </h2>
+
+              <p className="mt-1 text-sm text-muted-foreground">
+                Modifica tus direcciones de envío.
               </p>
             </Link>
           </div>
