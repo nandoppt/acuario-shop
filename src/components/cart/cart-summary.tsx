@@ -4,15 +4,26 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { useCart } from "@/components/cart/cart-context";
+import type { ShippingCalculation } from "@/lib/shipping/calculate-shipping";
 
 type CartSummaryProps = {
   checkout?: boolean;
+  shipping?: ShippingCalculation | null;
 };
 
 export function CartSummary({
   checkout = false,
+  shipping = null,
 }: CartSummaryProps) {
   const { subtotal, itemCount } = useCart();
+
+  const shippingCost =
+    shipping?.cost ?? null;
+
+  const total =
+    shippingCost !== null
+      ? subtotal + shippingCost
+      : null;
 
   return (
     <aside className="rounded-2xl border border-border bg-card p-6">
@@ -34,8 +45,28 @@ export function CartSummary({
             Subtotal
           </span>
 
-          <span>${subtotal.toFixed(2)}</span>
+          <span>
+            ${subtotal.toFixed(2)}
+          </span>
         </div>
+
+        {checkout && (
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">
+              Envío
+            </span>
+
+            <span className="font-medium">
+              {shipping === null
+                ? "Calculando..."
+                : shipping.status === "free"
+                  ? "Gratis"
+                  : shipping.status === "automatic"
+                    ? `$${shipping.cost.toFixed(2)}`
+                    : "Por confirmar"}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="my-6 h-px bg-border" />
@@ -46,9 +77,27 @@ export function CartSummary({
         </span>
 
         <span className="text-2xl font-semibold">
-          ${subtotal.toFixed(2)}
+          {!checkout
+            ? `$${subtotal.toFixed(2)}`
+            : total !== null
+              ? `$${total.toFixed(2)}`
+              : "Por confirmar"}
         </span>
       </div>
+
+      {checkout && shipping?.status === "confirm" && (
+        <p className="mt-4 text-xs leading-5 text-muted-foreground">
+          El costo de envío será confirmado antes de
+          finalizar la entrega.
+        </p>
+      )}
+
+      {!checkout && (
+        <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
+          Los costos de envío se calcularán durante el
+          proceso de compra.
+        </p>
+      )}
 
       <Link
         href={checkout ? "/tienda" : "/checkout"}
@@ -60,10 +109,6 @@ export function CartSummary({
 
         <ArrowRight size={18} />
       </Link>
-
-      <p className="mt-4 text-center text-xs leading-5 text-muted-foreground">
-        Los costos de envío se calcularán durante el proceso de compra.
-      </p>
     </aside>
   );
 }

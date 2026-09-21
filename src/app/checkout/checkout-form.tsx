@@ -1,9 +1,16 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import {
+  FormEvent,
+  useEffect,
+  useState,
+} from "react";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+
+import { calculateShipping } from "@/lib/shipping/calculate-shipping";
+import { getShippingSettings } from "@/app/checkout/shipping-actions";
 import { useCart } from "@/components/cart/cart-context";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { PaymentSelector } from "@/components/checkout/payment-selector";
@@ -14,12 +21,21 @@ type PaymentMethod =
   | "efectivo"
   | "payphone";
 
+type ShippingSettings = {
+  base_rate: number;
+  included_distance_km: number;
+  additional_km_rate: number;
+  max_automatic_rate: number;
+  free_shipping_minimum: number;
+  automatic_shipping_enabled: boolean;
+};
+
 export function CheckoutForm() {
   const router = useRouter();
 
   const {
     items,
-    products,
+    subtotal,
     clearCart,
   } = useCart();
 
@@ -31,6 +47,12 @@ export function CheckoutForm() {
 
   const [error, setError] =
     useState("");
+
+  const [shippingSettings, setShippingSettings] =
+  useState<ShippingSettings | null>(null);
+
+const [shippingLoading, setShippingLoading] =
+  useState(true);
 
   const [form, setForm] = useState({
     first_name: "",
@@ -53,6 +75,70 @@ export function CheckoutForm() {
       [field]: value,
     }));
   }
+
+ useEffect(() => {
+  let active = true;
+
+  async function loadShippingSettings() {
+    try {
+      const result = await getShippingSettings();
+
+      if (!active) return;
+
+      if (result.success && result.settings) {
+        setShippingSettings(result.settings);
+      } else if (!result.success) {
+        setError(
+          result.error ||
+            "No se pudo cargar el envío.",
+        );
+      } else {
+        setError(
+          result.error ||
+            "No se pudo cargar el envío.",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "[CHECKOUT SHIPPING]",
+        error,
+      );
+
+      if (active) {
+        setError(
+          "No se pudo cargar la configuración de envío.",
+        );
+      }
+    } finally {
+      if (active) {
+        setShippingLoading(false);
+      }
+    }
+  }
+
+  loadShippingSettings();
+
+  return () => {
+    active = false;
+  };
+}, []); 
+
+const shippingCalculation =
+  shippingSettings
+    ? calculateShipping({
+        subtotal,
+        distance_km: null,
+        config: shippingSettings,
+      })
+    : null;
+
+const shippingCost =
+  shippingCalculation?.cost ?? null;
+
+const total =
+  shippingCost !== null
+    ? subtotal + shippingCost
+    : null;
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
@@ -369,7 +455,10 @@ export function CheckoutForm() {
         {/* Resumen */}
 
         <div>
-          <CartSummary checkout />
+          <CartSummary
+  checkout
+  shipping={shippingCalculation}
+/>
           <button
             type="submit"
             disabled={loading}

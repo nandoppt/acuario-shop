@@ -10,6 +10,7 @@ import {
   Store,
   LogOut,
   ClipboardList,
+  Truck,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
@@ -29,6 +30,11 @@ const navigation = [
     label: "Pedidos",
     href: "/admin/pedidos",
     icon: ClipboardList,
+  },
+  {
+    href: "/admin/envios",
+    label: "Envíos",
+    icon: Truck,
   },
   {
     label: "Inventario",
