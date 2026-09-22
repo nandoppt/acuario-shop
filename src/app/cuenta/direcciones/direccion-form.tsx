@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Loader2, MapPin, X } from "lucide-react";
 
+import { LocationSelect } from "@/components/checkout/location-select";
+
 import {
   createAddress,
   updateAddress,
@@ -12,6 +14,7 @@ type Address = {
   id: string;
   province: string;
   city: string;
+  parish: string | null;
   address: string;
   reference: string | null;
   created_at: string;
@@ -41,6 +44,10 @@ export function DireccionForm({
     address?.city ?? "",
   );
 
+  const [parish, setParish] = useState(
+    address?.parish ?? "",
+  );
+
   const [addressText, setAddressText] = useState(
     address?.address ?? "",
   );
@@ -59,6 +66,7 @@ export function DireccionForm({
   useEffect(() => {
     setProvince(address?.province ?? "");
     setCity(address?.city ?? "");
+    setParish(address?.parish ?? "");
     setAddressText(address?.address ?? "");
     setReference(address?.reference ?? "");
     setMakeDefault(
@@ -84,6 +92,11 @@ export function DireccionForm({
       return;
     }
 
+    if (!parish.trim()) {
+      setError("La parroquia es obligatoria.");
+      return;
+    }
+
     if (!addressText.trim()) {
       setError("La dirección es obligatoria.");
       return;
@@ -94,6 +107,7 @@ export function DireccionForm({
     const input = {
       province,
       city,
+      parish,
       address: addressText,
       reference,
     };
@@ -173,47 +187,23 @@ export function DireccionForm({
         onSubmit={handleSubmit}
         className="space-y-5"
       >
-        <div className="grid gap-5 md:grid-cols-2">
-          <div className="space-y-2">
-            <label
-              htmlFor="province"
-              className="text-sm font-medium"
-            >
-              Provincia
-            </label>
-
-            <input
-              id="province"
-              value={province}
-              onChange={(event) =>
-                setProvince(event.target.value)
-              }
-              placeholder="Ej. Pichincha"
-              disabled={loading}
-              className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="city"
-              className="text-sm font-medium"
-            >
-              Ciudad
-            </label>
-
-            <input
-              id="city"
-              value={city}
-              onChange={(event) =>
-                setCity(event.target.value)
-              }
-              placeholder="Ej. Quito"
-              disabled={loading}
-              className="h-11 w-full rounded-xl border border-input bg-background px-3 text-sm outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-50"
-            />
-          </div>
-        </div>
+        <LocationSelect
+          province={province}
+          canton={city}
+          parish={parish}
+          onProvinceChange={(value) => {
+            setProvince(value);
+            setCity("");
+            setParish("");
+          }}
+          onCantonChange={(value) => {
+            setCity(value);
+            setParish("");
+          }}
+          onParishChange={(value) => {
+            setParish(value);
+          }}
+        />
 
         <div className="space-y-2">
           <label

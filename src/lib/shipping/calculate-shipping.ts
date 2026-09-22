@@ -3,16 +3,19 @@ export type ShippingCalculation =
       status: "free";
       cost: 0;
       message: "Envío gratis";
+      free_shipping_minimum: number;
     }
   | {
       status: "automatic";
       cost: number;
       message: "Envío calculado";
+      free_shipping_minimum: number;
     }
   | {
       status: "confirm";
       cost: null;
       message: "Envío por confirmar";
+      free_shipping_minimum: number;
     };
 
 type ShippingConfig = {
@@ -38,13 +41,17 @@ export function calculateShipping({
    * Envío gratis según subtotal.
    */
   if (subtotal >= config.free_shipping_minimum) {
-    return {
-      status: "free",
-      cost: 0,
-      message: "Envío gratis",
-    };
-  }
+  return {
+    status: "free",
+    cost: 0,
+    message: "Envío gratis",
+    free_shipping_minimum:
+      config.free_shipping_minimum,
+  };
+}
 
+
+  
   /*
    * Sin distancia no podemos calcular
    * automáticamente el envío.
@@ -54,6 +61,8 @@ export function calculateShipping({
       status: "confirm",
       cost: null,
       message: "Envío por confirmar",
+      free_shipping_minimum:
+      config.free_shipping_minimum,
     };
   }
 
@@ -92,6 +101,8 @@ export function calculateShipping({
       status: "confirm",
       cost: null,
       message: "Envío por confirmar",
+      free_shipping_minimum:
+      config.free_shipping_minimum,
     };
   }
 
@@ -99,5 +110,7 @@ export function calculateShipping({
     status: "automatic",
     cost: shippingCost,
     message: "Envío calculado",
+    free_shipping_minimum:
+      config.free_shipping_minimum,
   };
 }

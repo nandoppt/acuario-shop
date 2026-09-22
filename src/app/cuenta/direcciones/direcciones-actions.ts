@@ -8,6 +8,7 @@ const MAX_ADDRESSES = 4;
 type AddressInput = {
   province: string;
   city: string;
+  parish: string;
   address: string;
   reference: string;
 };
@@ -52,30 +53,88 @@ async function getAuthenticatedCustomer() {
   };
 }
 
+export async function getMyAddresses() {
+  const { user, customer } =
+    await getAuthenticatedCustomer();
+
+  if (!user) {
+    return {
+      success: false,
+      addresses: [],
+      error: "Tu sesión ha expirado.",
+    };
+  }
+
+  if (!customer) {
+    return {
+      success: false,
+      addresses: [],
+      error: "No encontramos tu cuenta de cliente.",
+    };
+  }
+
+  const admin = createAdminClient();
+
+  const {
+    data: addresses,
+    error,
+  } = await admin
+    .from("addresses")
+    .select(
+      `
+        id,
+        province,
+        city,
+        parish,
+        address,
+        reference,
+        created_at,
+        is_default
+      `,
+    )
+    .eq("customer_id", customer.id)
+    .order("is_default", {
+      ascending: false,
+    })
+    .order("created_at", {
+      ascending: false,
+    });
+
+  if (error) {
+    console.error(
+      "[ADDRESSES] Error obteniendo direcciones:",
+      error,
+    );
+
+    return {
+      success: false,
+      addresses: [],
+      error:
+        "No se pudieron cargar tus direcciones.",
+    };
+  }
+
+  return {
+    success: true,
+    addresses: addresses ?? [],
+  };
+}
+
 function normalizeInput(input: AddressInput) {
   return {
     province: input.province.trim(),
     city: input.city.trim(),
+    parish: input.parish.trim(),
     address: input.address.trim(),
     reference: input.reference.trim(),
   };
 }
 
-function validateInput(
-  input: ReturnType<typeof normalizeInput>,
-) {
-  if (!input.province) {
-    return "La provincia es obligatoria.";
-  }
-
-  if (!input.city) {
-    return "La ciudad es obligatoria.";
-  }
-
-  if (!input.address) {
-    return "La dirección es obligatoria.";
-  }
-
+function validateInput(input: ReturnType<typeof normalizeInput>) {
+  if (!input.province) return "La provincia es obligatoria.";
+  if (!input.city) return "La ciudad es obligatoria.";
+  if (!input.parish) return "La parroquia es obligatoria.";
+  if (!input.address) return "La dirección es obligatoria.";
   return null;
 }
 
@@ -173,12 +232,13 @@ export async function createAddress(
       customer_id: customer.id,
       province: data.province,
       city: data.city,
+      parish: data.parish,
       address: data.address,
       reference: data.reference || null,
       is_default: shouldBeDefault,
     })
     .select(
-      "id, province, city, address, reference, created_at, is_default",
+      "id, province, city, parish,address, reference, created_at, is_default",
     )
     .single();
 
@@ -298,6 +358,7 @@ export async function updateAddress(
     .update({
       province: data.province,
       city: data.city,
+      parish: data.parish,
       address: data.address,
       reference: data.reference || null,
       is_default: shouldBeDefault,
@@ -305,7 +366,7 @@ export async function updateAddress(
     .eq("id", addressId)
     .eq("customer_id", customer.id)
     .select(
-      "id, province, city, address, reference, created_at, is_default",
+      "id, province, city, parish, address, reference, created_at, is_default",
     )
     .single();
 

@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateShippingSettings } from "./shipping-actions";
+import { CoverageManager } from "./coverage-manager";
 
 type ShippingSettings = {
   id: string;
@@ -331,4 +332,5 @@ export function ShippingManager({ initialSettings }: Props) {
       </div>
     </div>
   );
+  <CoverageManager />
 }

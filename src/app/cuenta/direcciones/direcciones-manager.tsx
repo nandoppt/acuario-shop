@@ -33,6 +33,7 @@ type Address = {
   id: string;
   province: string;
   city: string;
+  parish: string | null;
   address: string;
   reference: string | null;
   created_at: string;
@@ -312,6 +313,12 @@ export function DireccionesManager({
                         <p className="mt-1 text-sm text-muted-foreground">
                           {address.province}
                         </p>
+
+                        {address.parish && (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {address.parish}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -408,37 +415,43 @@ export function DireccionesManager({
             </AlertDialogTitle>
 
             <AlertDialogDescription>
-  {addressToDelete?.is_default &&
-  addresses.length > 1
-    ? "Esta es tu dirección principal. Si la eliminas, otra dirección guardada pasará a ser principal."
-    : "¿Seguro que deseas eliminar esta dirección?"}
-</AlertDialogDescription>
+              {addressToDelete?.is_default &&
+              addresses.length > 1
+                ? "Esta es tu dirección principal. Si la eliminas, otra dirección guardada pasará a ser principal."
+                : "¿Seguro que deseas eliminar esta dirección?"}
+            </AlertDialogDescription>
 
-{addressToDelete && (
-  <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 text-sm">
-    <p className="font-medium text-foreground">
-      {addressToDelete.city},{" "}
-      {addressToDelete.province}
-    </p>
+            {addressToDelete && (
+              <div className="mt-4 rounded-xl border border-border bg-muted/50 p-4 text-sm">
+                <p className="font-medium text-foreground">
+                  {addressToDelete.city},{" "}
+                  {addressToDelete.province}
+                </p>
 
-    <p className="mt-1 leading-6 text-muted-foreground">
-      {addressToDelete.address}
-    </p>
+                {addressToDelete.parish && (
+                  <p className="mt-1 leading-6 text-muted-foreground">
+                    {addressToDelete.parish}
+                  </p>
+                )}
 
-    {addressToDelete.reference && (
-      <p className="mt-2 leading-6 text-muted-foreground">
-        <span className="font-medium text-foreground">
-          Referencia:
-        </span>{" "}
-        {addressToDelete.reference}
-      </p>
-    )}
-  </div>
-)}
+                <p className="mt-1 leading-6 text-muted-foreground">
+                  {addressToDelete.address}
+                </p>
 
-<p className="mt-4 text-xs text-muted-foreground">
-  Esta acción no se puede deshacer.
-</p>
+                {addressToDelete.reference && (
+                  <p className="mt-2 leading-6 text-muted-foreground">
+                    <span className="font-medium text-foreground">
+                      Referencia:
+                    </span>{" "}
+                    {addressToDelete.reference}
+                  </p>
+                )}
+              </div>
+            )}
+
+            <p className="mt-4 text-xs text-muted-foreground">
+              Esta acción no se puede deshacer.
+            </p>
           </AlertDialogHeader>
 
           <AlertDialogFooter>

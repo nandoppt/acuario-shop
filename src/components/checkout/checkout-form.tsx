@@ -1,9 +1,29 @@
 ﻿"use client";
 
-import { FormEvent, useState } from "react";
+import {
+  FormEvent,
+  useEffect,
+  useState,
+} from "react";
 import { Loader2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { LocationSelect } from "@/components/checkout/location-select";
+
+import {
+  getMyAddresses,
+} from "@/app/cuenta/direcciones/direcciones-actions";
+
+import {
+  AddressSelector,
+  type CheckoutAddress,
+} from "@/components/checkout/address-selector";
+
+import { calculateShipping } from "@/lib/shipping/calculate-shipping";
+import {
+  getShippingSettings,
+  getShippingCoverage,
+} from "@/app/checkout/shipping-actions";
 import { useCart } from "@/components/cart/cart-context";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { PaymentSelector } from "@/components/checkout/payment-selector";
@@ -14,11 +34,21 @@ type PaymentMethod =
   | "efectivo"
   | "payphone";
 
+type ShippingSettings = {
+  base_rate: number;
+  included_distance_km: number;
+  additional_km_rate: number;
+  max_automatic_rate: number;
+  free_shipping_minimum: number;
+  automatic_shipping_enabled: boolean;
+};
+
 export function CheckoutForm() {
   const router = useRouter();
 
   const {
     items,
+    subtotal,
     clearCart,
   } = useCart();
 
@@ -31,6 +61,40 @@ export function CheckoutForm() {
   const [error, setError] =
     useState("");
 
+    const [addresses, setAddresses] =
+  useState<CheckoutAddress[]>([]);
+
+const [selectedAddressId, setSelectedAddressId] =
+  useState<string | null>(null);
+
+const [addressesLoading, setAddressesLoading] =
+  useState(true);
+
+const [isAuthenticated, setIsAuthenticated] =
+  useState(false);
+
+  const [shippingSettings, setShippingSettings] =
+  useState<ShippingSettings | null>(null);
+
+const [shippingLoading, setShippingLoading] =
+  useState(true);
+
+type ShippingCoverage = {
+  id: string;
+  province: string;
+  city: string;
+  parish: string;
+  enabled: boolean;
+  shipping_cost: number | null;
+  notes: string | null;
+};
+
+const [shippingCoverage, setShippingCoverage] =
+  useState<ShippingCoverage | null>(null);
+
+const [coverageLoading, setCoverageLoading] =
+  useState(false);
+
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
@@ -38,9 +102,11 @@ export function CheckoutForm() {
     phone: "",
     province: "",
     city: "",
+    parish: "",
     address: "",
     reference: "",
     notes: "",
+    
   });
 
   function updateField(
@@ -53,6 +119,221 @@ export function CheckoutForm() {
     }));
   }
 
+function handleSelectAddress(address: CheckoutAddress) {
+  setSelectedAddressId(address.id);
+
+  setForm((current) => ({
+    ...current,
+    province: address.province,
+    city: address.city,
+    parish: address.parish ?? "",
+    address: address.address,
+    reference: address.reference ?? "",
+  }));
+}
+
+ useEffect(() => {
+  let active = true;
+
+  async function loadShippingSettings() {
+    try {
+      const result = await getShippingSettings();
+
+      if (!active) return;
+
+      if (result.success && result.settings) {
+        setShippingSettings(result.settings);
+      } else if (!result.success) {
+        setError(
+          result.error ||
+            "No se pudo cargar el envío.",
+        );
+      } else {
+        setError(
+          result.error ||
+            "No se pudo cargar el envío.",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "[CHECKOUT SHIPPING]",
+        error,
+      );
+
+      if (active) {
+        setError(
+          "No se pudo cargar la configuración de envío.",
+        );
+      }
+    } finally {
+      if (active) {
+        setShippingLoading(false);
+      }
+    }
+  }
+
+  loadShippingSettings();
+
+  return () => {
+    active = false;
+  };
+}, []); 
+
+useEffect(() => {
+  let active = true;
+
+  async function loadAddresses() {
+    try {
+      const result = await getMyAddresses();
+
+      if (!active) return;
+
+      if (result.success) {
+        setAddresses(result.addresses);
+        setIsAuthenticated(true);
+
+        const defaultAddress =
+          result.addresses.find(
+            (address) => address.is_default,
+          ) ?? result.addresses[0];
+
+        if (defaultAddress) {
+          setSelectedAddressId(
+            defaultAddress.id,
+          );
+        }
+      } else {
+        /*
+         * Si no hay sesión, continuamos como invitado.
+         */
+        setIsAuthenticated(false);
+        setAddresses([]);
+      }
+    } catch (error) {
+      console.error(
+        "[CHECKOUT ADDRESSES]",
+        error,
+      );
+
+      if (active) {
+        setIsAuthenticated(false);
+        setAddresses([]);
+      }
+    } finally {
+      if (active) {
+        setAddressesLoading(false);
+      }
+    }
+  }
+
+  loadAddresses();
+
+  return () => {
+    active = false;
+  };
+}, []);
+
+useEffect(() => {
+  let active = true;
+
+  async function loadShippingCoverage() {
+    if (!form.province || !form.city || !form.parish) {
+      setShippingCoverage(null);
+      setCoverageLoading(false);
+      return;
+    }
+
+    setCoverageLoading(true);
+
+    try {
+      const result = await getShippingCoverage(
+        form.province,
+        form.city,
+        form.parish,
+      );
+
+      if (!active) return;
+
+      if (result.success) {
+        setShippingCoverage(result.coverage);
+      } else {
+        setShippingCoverage(null);
+        setError(
+          result.error ||
+            "No se pudo consultar la cobertura de envío.",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "[CHECKOUT COVERAGE]",
+        error,
+      );
+
+      if (active) {
+        setShippingCoverage(null);
+        setError(
+          "No se pudo consultar la cobertura de envío.",
+        );
+      }
+    } finally {
+      if (active) {
+        setCoverageLoading(false);
+      }
+    }
+  }
+
+  loadShippingCoverage();
+
+  return () => {
+    active = false;
+  };
+}, [
+  form.province,
+  form.city,
+  form.parish,
+]);
+
+const shippingCalculation =
+  shippingSettings && form.parish
+    ? shippingCoverage?.enabled
+      ? shippingCoverage.shipping_cost !== null
+        ? subtotal >= shippingSettings.free_shipping_minimum
+          ? {
+              status: "free" as const,
+              cost: 0 as const,
+              message: "Envío gratis" as const,
+              free_shipping_minimum:
+                shippingSettings.free_shipping_minimum,
+            }
+          : {
+              status: "automatic" as const,
+              cost: shippingCoverage.shipping_cost,
+              message: "Envío calculado" as const,
+              free_shipping_minimum:
+                shippingSettings.free_shipping_minimum,
+            }
+        : calculateShipping({
+            subtotal,
+            distance_km: null,
+            config: shippingSettings,
+          })
+      : {
+          status: "confirm" as const,
+          cost: null,
+          message: "Envío por confirmar" as const,
+          free_shipping_minimum:
+            shippingSettings.free_shipping_minimum,
+        }
+    : null;
+
+const shippingCost =
+  shippingCalculation?.cost ?? null;
+
+const total =
+  shippingCost !== null
+    ? subtotal + shippingCost
+    : null;
+
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
   ) {
@@ -61,7 +342,9 @@ export function CheckoutForm() {
     setError("");
 
     if (items.length === 0) {
-      setError("Tu carrito está vacío.");
+      setError(
+        "Tu carrito está vacío.",
+      );
       return;
     }
 
@@ -76,9 +359,13 @@ export function CheckoutForm() {
 
           shipping_cost: 0,
 
+          notes: form.notes,
+
           items: items.map((item) => ({
-            product_id: item.productId,
-            quantity: item.quantity,
+            product_id:
+              item.productId,
+            quantity:
+              item.quantity,
           })),
         });
 
@@ -87,18 +374,27 @@ export function CheckoutForm() {
           result.error ||
             "No se pudo crear el pedido.",
         );
+
         return;
       }
 
+      /*
+       * El pedido ya fue creado correctamente.
+       * Ahora sí podemos limpiar el carrito.
+       */
       clearCart();
 
+      /*
+       * Guardamos temporalmente la información
+       * necesaria para mostrar la confirmación.
+       */
       sessionStorage.setItem(
         "vidabajoagua-last-order",
         JSON.stringify(result.order),
       );
 
       router.push(
-       `/pedido/confirmado/${result.order.tracking_token}`,
+        `/pedido/confirmado/${result.order.order_id}`,
       );
     } catch (error) {
       console.error(
@@ -158,7 +454,7 @@ export function CheckoutForm() {
       >
         <div className="space-y-8">
 
-          {/* Datos del cliente */}
+          {/* Cliente */}
 
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="text-xl font-semibold">
@@ -166,13 +462,14 @@ export function CheckoutForm() {
             </h2>
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
+
               <input
                 required
                 value={form.first_name}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "first_name",
-                    event.target.value,
+                    e.target.value,
                   )
                 }
                 placeholder="Nombres"
@@ -182,10 +479,10 @@ export function CheckoutForm() {
               <input
                 required
                 value={form.last_name}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "last_name",
-                    event.target.value,
+                    e.target.value,
                   )
                 }
                 placeholder="Apellidos"
@@ -196,10 +493,10 @@ export function CheckoutForm() {
                 required
                 type="tel"
                 value={form.phone}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "phone",
-                    event.target.value,
+                    e.target.value,
                   )
                 }
                 placeholder="Teléfono"
@@ -210,10 +507,10 @@ export function CheckoutForm() {
                 required
                 type="email"
                 value={form.email}
-                onChange={(event) =>
+                onChange={(e) =>
                   updateField(
                     "email",
-                    event.target.value,
+                    e.target.value,
                   )
                 }
                 placeholder="Correo electrónico"
@@ -229,76 +526,104 @@ export function CheckoutForm() {
               Dirección de entrega
             </h2>
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <input
-                required
-                value={form.province}
-                onChange={(event) =>
-                  updateField(
-                    "province",
-                    event.target.value,
-                  )
-                }
-                placeholder="Provincia"
-                className="h-12 rounded-xl border border-border bg-background px-4"
-              />
+            <div className="mt-6">
+              {addressesLoading ? (
+                <div className="flex items-center gap-3 rounded-xl border border-border bg-background px-4 py-5 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Cargando tus direcciones...
+                </div>
+              ) : isAuthenticated ? (
+                addresses.length > 0 ? (
+                  <AddressSelector
+                    addresses={addresses}
+                    selectedAddressId={selectedAddressId}
+                    onSelect={handleSelectAddress}
+                    onAddAddress={() => router.push("/cuenta/direcciones")}
+                  />
+                ) : (
+                  <div className="rounded-xl border border-dashed border-border bg-background p-6">
+                    <p className="font-medium">
+                      No tienes direcciones guardadas.
+                    </p>
 
-              <input
-                required
-                value={form.city}
-                onChange={(event) =>
-                  updateField(
-                    "city",
-                    event.target.value,
-                  )
-                }
-                placeholder="Ciudad"
-                className="h-12 rounded-xl border border-border bg-background px-4"
-              />
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Agrega una dirección desde tu cuenta para continuar con la compra.
+                    </p>
 
-              <textarea
-                required
-                value={form.address}
-                onChange={(event) =>
-                  updateField(
-                    "address",
-                    event.target.value,
-                  )
-                }
-                placeholder="Dirección completa"
-                rows={3}
-                className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
-              />
+                    <button
+                      type="button"
+                      onClick={() => router.push("/cuenta/direcciones")}
+                      className="mt-4 inline-flex h-11 items-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                    >
+                      Agregar dirección
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <LocationSelect
+                    province={form.province}
+                    canton={form.city}
+                    parish={form.parish}
+                    onProvinceChange={(value) =>
+                      setForm((current) => ({
+                        ...current,
+                        province: value,
+                        city: "",
+                        parish: "",
+                      }))
+                    }
+                    onCantonChange={(value) =>
+                      setForm((current) => ({
+                        ...current,
+                        city: value,
+                        parish: "",
+                      }))
+                    }
+                    onParishChange={(value) =>
+                      setForm((current) => ({
+                        ...current,
+                        parish: value,
+                      }))
+                    }
+                  />
 
-              <textarea
-                value={form.reference}
-                onChange={(event) =>
-                  updateField(
-                    "reference",
-                    event.target.value,
-                  )
-                }
-                placeholder="Referencia (opcional)"
-                rows={2}
-                className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
-              />
+                  <textarea
+                    required
+                    value={form.address}
+                    onChange={(e) =>
+                      updateField("address", e.target.value)
+                    }
+                    placeholder="Dirección completa"
+                    rows={3}
+                    className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
+                  />
 
-              <textarea
-                value={form.notes}
-                onChange={(event) =>
-                  updateField(
-                    "notes",
-                    event.target.value,
-                  )
-                }
-                placeholder="Observaciones del pedido (opcional)"
-                rows={2}
-                className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
-              />
+                  <textarea
+                    value={form.reference}
+                    onChange={(e) =>
+                      updateField("reference", e.target.value)
+                    }
+                    placeholder="Referencia (opcional)"
+                    rows={2}
+                    className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
+                  />
+
+                  <textarea
+                    value={form.notes}
+                    onChange={(e) =>
+                      updateField("notes", e.target.value)
+                    }
+                    placeholder="Observaciones del pedido (opcional)"
+                    rows={2}
+                    className="md:col-span-2 rounded-xl border border-border bg-background px-4 py-3"
+                  />
+                </div>
+              )}
             </div>
           </section>
 
-          {/* Método de pago */}
+          {/* Pago */}
 
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="text-xl font-semibold">
@@ -351,12 +676,14 @@ export function CheckoutForm() {
         {/* Resumen */}
 
         <div>
-          <CartSummary checkout />
-
+          <CartSummary
+  checkout
+  shipping={shippingCalculation}
+/>
           <button
             type="submit"
-            disabled={loading}
-            className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={loading || coverageLoading}
+           className="mt-4 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-primary-foreground shadow-sm transition hover:-translate-y-0.5 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
               <>
@@ -366,6 +693,8 @@ export function CheckoutForm() {
                 />
                 Generando pedido...
               </>
+            ) : coverageLoading ? (
+              "Calculando envío..."
             ) : (
               "Confirmar pedido"
             )}

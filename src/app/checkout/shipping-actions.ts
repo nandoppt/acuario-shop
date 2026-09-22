@@ -3,6 +3,79 @@
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+
+export async function getShippingCoverage(
+  province: string,
+  city: string,
+  parish: string,
+) {
+  try {
+    if (!province || !city || !parish) {
+      return {
+        success: true,
+        coverage: null,
+      };
+    }
+
+    const admin = createAdminClient();
+
+    const { data, error } = await admin
+      .from("shipping_coverage")
+      .select(`
+        id,
+        province,
+        city,
+        parish,
+        enabled,
+        shipping_cost,
+        notes
+      `)
+      .eq("province", province)
+      .eq("city", city)
+      .eq("parish", parish)
+      .maybeSingle();
+
+    if (error) {
+      console.error(
+        "[SHIPPING COVERAGE]",
+        error,
+      );
+
+      return {
+        success: false,
+        coverage: null,
+        error:
+          "No se pudo consultar la cobertura de envío.",
+      };
+    }
+
+      console.log("[SHIPPING COVERAGE] Consulta:", {
+  province,
+  city,
+  parish,
+});
+
+console.log("[SHIPPING COVERAGE] Resultado:", data);
+
+    return {
+      success: true,
+      coverage: data,
+    };
+  } catch (error) {
+    console.error(
+      "[SHIPPING COVERAGE]",
+      error,
+    );
+
+    return {
+      success: false,
+      coverage: null,
+      error:
+        "No se pudo consultar la cobertura de envío.",
+    };
+  }
+}
+
 export async function getShippingSettings() {
   const supabase = await createClient();
 

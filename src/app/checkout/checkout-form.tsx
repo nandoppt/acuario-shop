@@ -8,9 +8,13 @@ import {
 import { Loader2, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-
+import { LocationSelect } from "@/components/checkout/location-select";
 import { calculateShipping } from "@/lib/shipping/calculate-shipping";
-import { getShippingSettings } from "@/app/checkout/shipping-actions";
+import {
+  getShippingSettings,
+  getShippingCoverage,
+} from "@/app/checkout/shipping-actions";
+
 import { useCart } from "@/components/cart/cart-context";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { PaymentSelector } from "@/components/checkout/payment-selector";
@@ -51,6 +55,22 @@ export function CheckoutForm() {
   const [shippingSettings, setShippingSettings] =
   useState<ShippingSettings | null>(null);
 
+  type ShippingCoverage = {
+  id: string;
+  province: string;
+  city: string;
+  parish: string;
+  enabled: boolean;
+  shipping_cost: number | null;
+  notes: string | null;
+};
+
+const [shippingCoverage, setShippingCoverage] =
+  useState<ShippingCoverage | null>(null);
+
+const [coverageLoading, setCoverageLoading] =
+  useState(false);
+
 const [shippingLoading, setShippingLoading] =
   useState(true);
 
@@ -61,9 +81,11 @@ const [shippingLoading, setShippingLoading] =
     phone: "",
     province: "",
     city: "",
+    parish: "",
     address: "",
     reference: "",
     notes: "",
+    
   });
 
   function updateField(
@@ -123,13 +145,134 @@ const [shippingLoading, setShippingLoading] =
   };
 }, []); 
 
+useEffect(() => {
+  console.log("[CHECKOUT] Coverage effect:", {
+    province: form.province,
+    city: form.city,
+    parish: form.parish,
+  });
+
+  let active = true;
+
+  async function loadShippingCoverage() {
+    console.log("[CHECKOUT] Intentando consultar cobertura...");
+
+    if (
+      !form.province ||
+      !form.city ||
+      !form.parish
+    ) {
+      console.log(
+        "[CHECKOUT] Coverage detenida: faltan datos",
+      );
+
+      setShippingCoverage(null);
+      setCoverageLoading(false);
+
+      return;
+    }
+
+    setCoverageLoading(true);
+
+    try {
+      console.log(
+        "[CHECKOUT] Llamando getShippingCoverage:",
+        {
+          province: form.province,
+          city: form.city,
+          parish: form.parish,
+        },
+      );
+
+      const result =
+        await getShippingCoverage(
+          form.province,
+          form.city,
+          form.parish,
+        );
+
+      console.log(
+        "[CHECKOUT] Resultado coverage:",
+        result,
+      );
+
+      if (!active) return;
+
+      if (result.success) {
+        setShippingCoverage(
+          result.coverage,
+        );
+      } else {
+        setShippingCoverage(null);
+
+        setError(
+          result.error ||
+            "No se pudo consultar la cobertura de envío.",
+        );
+      }
+    } catch (error) {
+      console.error(
+        "[CHECKOUT COVERAGE]",
+        error,
+      );
+
+      if (active) {
+        setShippingCoverage(null);
+
+        setError(
+          "No se pudo consultar la cobertura de envío.",
+        );
+      }
+    } finally {
+      if (active) {
+        setCoverageLoading(false);
+      }
+    }
+  }
+
+  loadShippingCoverage();
+
+  return () => {
+    active = false;
+  };
+}, [
+  form.province,
+  form.city,
+  form.parish,
+]);
+
 const shippingCalculation =
-  shippingSettings
-    ? calculateShipping({
-        subtotal,
-        distance_km: null,
-        config: shippingSettings,
-      })
+  shippingSettings && form.parish
+    ? shippingCoverage?.enabled
+      ? shippingCoverage.shipping_cost !== null
+        ? subtotal >=
+          shippingSettings.free_shipping_minimum
+          ? {
+              status: "free" as const,
+              cost: 0 as const,
+              message: "Envío gratis" as const,
+              free_shipping_minimum:
+                shippingSettings.free_shipping_minimum,
+            }
+          : {
+              status: "automatic" as const,
+              cost: shippingCoverage.shipping_cost,
+              message: "Envío calculado" as const,
+              free_shipping_minimum:
+                shippingSettings.free_shipping_minimum,
+            }
+        : calculateShipping({
+            subtotal,
+            distance_km: null,
+            config: shippingSettings,
+          })
+      : {
+          status: "confirm" as const,
+          cost: null,
+          message: "Envío por confirmar" as const,
+          free_shipping_minimum:
+            shippingSettings.free_shipping_minimum,
+        }
     : null;
 
 const shippingCost =
@@ -163,7 +306,7 @@ const total =
 
           payment_method: payment,
 
-          shipping_cost: 0,
+          shipping_cost: shippingCost ?? 0,
 
           notes: form.notes,
 
@@ -334,31 +477,36 @@ const total =
 
             <div className="mt-6 grid gap-4 md:grid-cols-2">
 
-              <input
-                required
-                value={form.province}
-                onChange={(e) =>
-                  updateField(
-                    "province",
-                    e.target.value,
-                  )
+              <LocationSelect
+                province={form.province}
+                canton={form.city}
+                parish={form.parish}
+                onProvinceChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    province: value,
+                    city: "",
+                    parish: "",
+                  }))
                 }
-                placeholder="Provincia"
-                className="h-12 rounded-xl border border-border bg-background px-4"
+                onCantonChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    city: value,
+                    parish: "",
+                  }))
+                }
+                onParishChange={(value) =>
+                  setForm((current) => ({
+                    ...current,
+                    parish: value,
+                  }))
+                }
               />
 
-              <input
-                required
-                value={form.city}
-                onChange={(e) =>
-                  updateField(
-                    "city",
-                    e.target.value,
-                  )
-                }
-                placeholder="Ciudad"
-                className="h-12 rounded-xl border border-border bg-background px-4"
-              />
+                    <div className="text-xs text-muted-foreground">
+  DEBUG: {form.province} / {form.city} / {form.parish}
+</div>
 
               <textarea
                 required
@@ -461,7 +609,7 @@ const total =
 />
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || coverageLoading}
             className="mt-6 inline-flex h-14 w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 font-semibold text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {loading ? (
@@ -472,6 +620,8 @@ const total =
                 />
                 Generando pedido...
               </>
+            ) : coverageLoading ? (
+              "Calculando envío..."
             ) : (
               "Confirmar pedido"
             )}

@@ -65,7 +65,7 @@ export default async function DireccionesPage() {
   const { data: addresses, error: addressesError } = await admin
     .from("addresses")
     .select(
-      "id, province, city, address, reference, created_at, is_default",
+      "id, province, city, parish, address,  reference, created_at, is_default",
     )
     .eq("customer_id", customer.id)
     .order("is_default", { ascending: false })

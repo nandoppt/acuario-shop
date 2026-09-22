@@ -15,6 +15,7 @@ type CreateOrderInput = {
   phone: string;
   province: string;
   city: string;
+  parish: string;
   address: string;
   reference: string;
   payment_method:
@@ -76,6 +77,7 @@ export async function createPendingOrder(
       p_phone: input.phone,
       p_province: input.province,
       p_city: input.city,
+      p_parish: input.parish,
       p_address: input.address,
       p_reference: input.reference,
       p_items: input.items,

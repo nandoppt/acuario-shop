@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { useCart } from "@/components/cart/cart-context";
 import type { ShippingCalculation } from "@/lib/shipping/calculate-shipping";
@@ -31,16 +31,18 @@ export function CartSummary({
         Resumen del pedido
       </h2>
 
-      <div className="mt-6 space-y-3 text-sm">
-        <div className="flex justify-between">
+      <div className="mt-6 space-y-4 text-sm">
+        <div className="flex items-center justify-between">
           <span className="text-muted-foreground">
             Productos
           </span>
 
-          <span>{itemCount}</span>
+          <span className="font-medium">
+            {itemCount}
+          </span>
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex items-center justify-between">
           <span className="text-muted-foreground">
             Subtotal
           </span>
@@ -51,20 +53,26 @@ export function CartSummary({
         </div>
 
         {checkout && (
-          <div className="flex justify-between">
+          <div className="flex items-center justify-between">
             <span className="text-muted-foreground">
-              Envío
+              Costo de envío
             </span>
 
             <span className="font-medium">
-              {shipping === null
-                ? "Calculando..."
-                : shipping.status === "free"
-                  ? "Gratis"
-                  : shipping.status === "automatic"
-                    ? `$${shipping.cost.toFixed(2)}`
-                    : "Por confirmar"}
+              {shipping?.status === "free"
+                ? "Gratis"
+                : shippingCost !== null
+                  ? `$${shippingCost.toFixed(2)}`
+                  : "Por confirmar"}
             </span>
+          </div>
+        )}
+
+        {checkout && shipping?.status === "free" && (
+          <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-800">
+            Envío gratis en compras de $
+            {shipping.free_shipping_minimum.toFixed(2)} o más.
+            Aplican restricciones según zona de entrega.
           </div>
         )}
       </div>
@@ -76,7 +84,7 @@ export function CartSummary({
           Total
         </span>
 
-        <span className="text-2xl font-semibold">
+        <span className="text-2xl font-semibold tracking-tight">
           {!checkout
             ? `$${subtotal.toFixed(2)}`
             : total !== null
@@ -101,13 +109,17 @@ export function CartSummary({
 
       <Link
         href={checkout ? "/tienda" : "/checkout"}
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-medium text-primary-foreground transition hover:-translate-y-0.5 hover:opacity-90"
+        className={
+          checkout
+            ? "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-6 py-3.5 font-medium text-foreground transition hover:bg-muted"
+            : "mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3.5 font-medium text-primary-foreground transition hover:-translate-y-0.5 hover:opacity-90"
+        }
       >
+        <ArrowLeft size={17} />
+
         {checkout
           ? "Continuar comprando"
           : "Continuar compra"}
-
-        <ArrowRight size={18} />
       </Link>
     </aside>
   );
