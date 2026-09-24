@@ -34,12 +34,15 @@ export default async function PedidoConfirmadoPage({
           total,
           created_at,
           notes,
-          customers (
-            first_name,
-            last_name,
-            email,
-            phone
-          ),
+          buyer_first_name,
+          buyer_last_name,
+          buyer_email,
+          buyer_phone,
+          recipient_is_other,
+          recipient_first_name,
+          recipient_last_name,
+          recipient_phone,
+          additional_email,
           addresses (
             province,
             city,
@@ -94,9 +97,12 @@ export default async function PedidoConfirmadoPage({
     );
   }
 
-  const customer = Array.isArray(order.customers)
-    ? order.customers[0]
-    : order.customers;
+  const customer = {
+    first_name: order.buyer_first_name,
+    last_name: order.buyer_last_name,
+    email: order.buyer_email,
+    phone: order.buyer_phone,
+  };
 
   const address = Array.isArray(order.addresses)
     ? order.addresses[0]
@@ -349,18 +355,42 @@ export default async function PedidoConfirmadoPage({
             </h2>
 
             <div className="mt-4 space-y-3 text-sm">
-              <p>
-                {customer?.first_name}{" "}
-                {customer?.last_name}
+              <p className="font-medium">
+                {customer.first_name} {customer.last_name}
               </p>
 
               <p className="text-muted-foreground">
-                {customer?.phone}
+                {customer.phone}
               </p>
 
               <p className="text-muted-foreground">
-                {customer?.email}
+                {customer.email}
               </p>
+
+              {order.recipient_is_other && (
+                <div className="border-t border-border pt-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Recibe el pedido
+                  </p>
+                  <p className="mt-2 font-medium">
+                    {order.recipient_first_name} {order.recipient_last_name}
+                  </p>
+                  <p className="mt-1 text-muted-foreground">
+                    {order.recipient_phone}
+                  </p>
+                </div>
+              )}
+
+              {order.additional_email && (
+                <div className="border-t border-border pt-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Confirmación enviada también a
+                  </p>
+                  <p className="mt-2 text-muted-foreground">
+                    {order.additional_email}
+                  </p>
+                </div>
+              )}
 
               {payment?.payment_method !== "efectivo" && address && (
                 <div className="border-t border-border pt-3">
