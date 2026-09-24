@@ -106,6 +106,14 @@ export default async function PedidoConfirmadoPage({
     ? order.payments[0]
     : order.payments;
 
+  const { data: paymentSettings } = await supabase
+    .from("payment_settings")
+    .select(
+      "bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url",
+    )
+    .limit(1)
+    .single();
+
   const paymentLabels = {
     transferencia: "Transferencia / QR",
     efectivo: "Pago en efectivo",
@@ -240,18 +248,20 @@ export default async function PedidoConfirmadoPage({
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">
-                Envío
-              </span>
+            {payment?.payment_method !== "efectivo" && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Envío
+                </span>
 
-              <span>
-                $
-                {Number(
-                  order.shipping_cost,
-                ).toFixed(2)}
-              </span>
-            </div>
+                <span>
+                  $
+                  {Number(
+                    order.shipping_cost,
+                  ).toFixed(2)}
+                </span>
+              </div>
+            )}
 
             <div className="flex justify-between border-t border-border pt-4 text-lg font-semibold">
               <span>Total</span>
@@ -281,25 +291,32 @@ export default async function PedidoConfirmadoPage({
 
             {payment?.payment_method ===
               "transferencia" && (
-              <div className="mt-5 rounded-xl bg-secondary p-4">
-                <p className="text-sm font-medium">
-                  Completa tu transferencia
-                </p>
-
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  En la siguiente etapa
-                  agregaremos los datos bancarios
-                  y el código QR de VidaBajoAgua.
-                </p>
+              <div className="mt-5 rounded-xl bg-secondary p-4 text-sm leading-6">
+                <p className="font-medium">Completa tu transferencia</p>
+                <div className="mt-4 space-y-2">
+                  <p><strong>Banco:</strong> {paymentSettings?.bank_name ?? "Por confirmar"}</p>
+                  <p><strong>Tipo de cuenta:</strong> {paymentSettings?.account_type ?? "Por confirmar"}</p>
+                  <p><strong>Número de cuenta:</strong> {paymentSettings?.account_number ?? "Por confirmar"}</p>
+                  <p><strong>Titular:</strong> {paymentSettings?.account_holder ?? "Por confirmar"}</p>
+                  <p><strong>Cédula / RUC:</strong> {paymentSettings?.identification ?? "Por confirmar"}</p>
+                  {paymentSettings?.contact_email && (
+                    <p><strong>Comprobantes:</strong> {paymentSettings.contact_email}</p>
+                  )}
+                </div>
+                {paymentSettings?.qr_url && (
+                  <img
+                    src={paymentSettings.qr_url}
+                    alt="Código QR de transferencia"
+                    className="mt-5 mx-auto h-56 w-56 rounded-xl border bg-background object-contain p-2"
+                  />
+                )}
               </div>
             )}
 
             {payment?.payment_method ===
               "efectivo" && (
               <div className="mt-5 rounded-xl bg-secondary p-4 text-sm leading-6 text-muted-foreground">
-                El pago se realizará en efectivo
-                según la modalidad de entrega
-                acordada.
+                El pago se realizará en efectivo durante la entrega presencial.
               </div>
             )}
 
@@ -316,7 +333,9 @@ export default async function PedidoConfirmadoPage({
 
           <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="text-lg font-semibold">
-              Datos de entrega
+              {payment?.payment_method === "efectivo"
+                ? "Entrega presencial"
+                : "Datos de entrega"}
             </h2>
 
             <div className="mt-4 space-y-3 text-sm">
@@ -333,7 +352,7 @@ export default async function PedidoConfirmadoPage({
                 {customer?.email}
               </p>
 
-              {address && (
+              {payment?.payment_method !== "efectivo" && address && (
                 <div className="border-t border-border pt-3">
                   <p>
                     {address.address}
