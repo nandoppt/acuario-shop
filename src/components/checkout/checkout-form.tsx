@@ -698,9 +698,10 @@ const total =
 
         <div>
           <CartSummary
-  checkout
-  shipping={shippingCalculation}
-/>
+            checkout
+            shipping={shippingCalculation}
+            paymentMethod={payment}
+          />
           <button
             type="submit"
             disabled={loading || coverageLoading}
