@@ -198,9 +198,15 @@ useEffect(() => {
           ) ?? result.addresses[0];
 
         if (defaultAddress) {
-          setSelectedAddressId(
-            defaultAddress.id,
-          );
+          setSelectedAddressId(defaultAddress.id);
+          setForm((current) => ({
+            ...current,
+            province: defaultAddress.province,
+            city: defaultAddress.city,
+            parish: defaultAddress.parish ?? "",
+            address: defaultAddress.address,
+            reference: defaultAddress.reference ?? "",
+          }));
         }
       } else {
         /*
