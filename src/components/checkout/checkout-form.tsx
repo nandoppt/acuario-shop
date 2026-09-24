@@ -354,6 +354,11 @@ const total =
       return;
     }
 
+    if (payment !== "efectivo" && isAuthenticated && !selectedAddressId) {
+      setError("Debes seleccionar una dirección de entrega.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -528,7 +533,8 @@ const total =
 
           {/* Dirección */}
 
-          <section className="rounded-2xl border border-border bg-card p-6">
+          {payment !== "efectivo" && (
+            <section className="rounded-2xl border border-border bg-card p-6">
             <h2 className="text-xl font-semibold">
               Dirección de entrega
             </h2>
@@ -628,7 +634,9 @@ const total =
                 </div>
               )}
             </div>
-          </section>
+
+            </section>
+          )}
 
           {/* Pago */}
 
@@ -636,6 +644,12 @@ const total =
             <h2 className="text-xl font-semibold">
               Método de pago
             </h2>
+
+            {payment === "efectivo" && (
+              <div className="mt-6 rounded-xl border border-border bg-secondary px-4 py-3 text-sm leading-6">
+                El pago en efectivo corresponde a una entrega presencial. No se calculará ni cobrará envío.
+              </div>
+            )}
 
             <div className="mt-6">
               <PaymentSelector
