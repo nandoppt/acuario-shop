@@ -124,3 +124,24 @@ export async function getShippingSettings() {
     settings: data,
   };
 }
+
+export async function getPaymentSettings() {
+  try {
+    const admin = createAdminClient();
+    const { data, error } = await admin
+      .from("payment_settings")
+      .select("bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url, transfer_enabled")
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error("[PAYMENT SETTINGS]", error);
+      return { success: false, settings: null, error: "No se pudo cargar la configuración de pagos." };
+    }
+
+    return { success: true, settings: data };
+  } catch (error) {
+    console.error("[PAYMENT SETTINGS]", error);
+    return { success: false, settings: null, error: "No se pudo cargar la configuración de pagos." };
+  }
+}
