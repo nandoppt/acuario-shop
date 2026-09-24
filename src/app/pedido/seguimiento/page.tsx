@@ -164,6 +164,7 @@ const [result, setResult] =
     }
 
     setResult(response);
+    setTrackingToken("");
   };
 
   const handleCustomerSubmit = async (
@@ -299,6 +300,7 @@ const handleVerificationSubmit = async (
               type="button"
               onClick={() => {
                 setSearchMode("tracking");
+                setTrackingToken("");
                 setError("");
                 setResult(null);
                 setCustomerOrders([]);
@@ -320,6 +322,7 @@ const handleVerificationSubmit = async (
               type="button"
               onClick={() => {
                 setSearchMode("customer");
+                setTrackingToken("");
                 setError("");
                 setResult(null);
                 setCustomerOrders([]);
@@ -574,6 +577,42 @@ const handleVerificationSubmit = async (
   </form>
 )}
         </div>
+
+        {result?.success && result.order && (
+          <div className="mt-8 rounded-xl border bg-card shadow-sm">
+            <div className="border-b px-6 py-5">
+              <h2 className="text-lg font-semibold">
+                Pedido #{String(result.order.order_number).padStart(4, "0")}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Consulta la información y el estado de tu pedido.
+              </p>
+            </div>
+
+            <TrackedOrderDetails
+              order={result.order}
+              statusLabels={statusLabels}
+              paymentLabels={paymentLabels}
+              paymentStatusLabels={paymentStatusLabels}
+              timeline={timeline}
+              statusOrder={statusOrder}
+            />
+
+            <div className="border-t px-6 py-4">
+              <button
+                type="button"
+                onClick={() => {
+                  setResult(null);
+                  setTrackingToken("");
+                  setError("");
+                }}
+                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+              >
+                Consultar otro pedido
+              </button>
+            </div>
+          </div>
+        )}
 
         {customerOrders.length > 1 && (
             <div className="mt-8 rounded-xl border bg-card p-6 shadow-sm">
