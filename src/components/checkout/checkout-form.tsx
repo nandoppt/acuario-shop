@@ -354,10 +354,11 @@ const total =
       const result =
         await createPendingOrder({
           ...form,
+          address_id: isAuthenticated ? selectedAddressId : null,
 
           payment_method: payment,
 
-          shipping_cost: 0,
+          shipping_cost: shippingCost ?? 0,
 
           notes: form.notes,
 
