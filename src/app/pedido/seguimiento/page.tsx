@@ -528,17 +528,49 @@ const handleVerificationSubmit = async (
       )}
     </button>
 
-    <button
-      type="button"
-      onClick={() => {
-        setCodeSent(false);
-        setVerificationCode("");
-        setError("");
-      }}
-      className="w-full text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-    >
-      Cambiar correo electrónico
-    </button>
+    <div className="flex flex-col gap-3 text-center sm:flex-row sm:justify-center sm:gap-6">
+      <button
+        type="button"
+        disabled={loading}
+        onClick={async () => {
+          setError("");
+          setVerificationCode("");
+          setLoading(true);
+
+          const response =
+            await requestOrderVerificationCode(
+              email.trim(),
+            );
+
+          setLoading(false);
+
+          if (!response.success) {
+            setError(
+              response.error ??
+                "No se pudo reenviar el código.",
+            );
+            return;
+          }
+
+          setError("");
+        }}
+        className="text-sm font-medium text-primary underline-offset-4 hover:underline disabled:pointer-events-none disabled:opacity-50"
+      >
+        {loading ? "Enviando..." : "Reenviar código"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setCodeSent(false);
+          setVerificationCode("");
+          setError("");
+        }}
+        className="text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+      >
+        Cambiar correo electrónico
+      </button>
+    </div>
   </form>
 )}
         </div>
