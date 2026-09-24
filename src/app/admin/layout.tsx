@@ -11,6 +11,7 @@ import {
   LogOut,
   ClipboardList,
   Truck,
+  CreditCard,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
@@ -35,6 +36,11 @@ const navigation = [
     href: "/admin/envios",
     label: "Envíos",
     icon: Truck,
+  },
+  {
+    href: "/admin/pagos",
+    label: "Pagos",
+    icon: CreditCard,
   },
   {
     label: "Inventario",
