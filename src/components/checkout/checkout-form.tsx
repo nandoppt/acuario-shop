@@ -406,7 +406,7 @@ const total =
       );
 
       router.push(
-        `/pedido/confirmado/${result.order.order_id}`,
+        `/pedido/confirmado/${result.order.tracking_token}`,
       );
     } catch (error) {
       console.error(
