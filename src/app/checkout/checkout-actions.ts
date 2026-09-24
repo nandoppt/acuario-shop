@@ -25,6 +25,7 @@ type CreateOrderInput = {
   shipping_cost: number;
   notes: string;
   items: CheckoutItem[];
+  address_id?: string | null;
 };
 
 export async function createPendingOrder(
@@ -87,6 +88,7 @@ export async function createPendingOrder(
         input.shipping_cost,
       p_notes: input.notes,
       p_auth_user_id: authUserId,
+      p_address_id: input.address_id ?? null,
     },
   );
 
