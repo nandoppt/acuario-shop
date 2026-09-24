@@ -51,9 +51,12 @@ export async function getMyCheckoutProfile(): Promise<{
 
 
 async function sendOrderConfirmationEmail(order: any) {
-  const customer = Array.isArray(order.customers)
-    ? order.customers[0]
-    : order.customers;
+  const customer = {
+    first_name: order.buyer_first_name,
+    last_name: order.buyer_last_name,
+    email: order.buyer_email,
+    phone: order.buyer_phone,
+  };
   const payment = Array.isArray(order.payments)
     ? order.payments[0]
     : order.payments;
@@ -104,6 +107,7 @@ async function sendOrderConfirmationEmail(order: any) {
   await transporter.sendMail({
     from: `"VidaBajoAgua" <${process.env.SMTP_USER}>`,
     to: customer.email,
+    ...(order.additional_email ? { cc: order.additional_email } : {}),
     subject: `Pedido #${String(order.order_number).padStart(4, "0")} recibido — VidaBajoAgua`,
     text: `Tu pedido #${String(order.order_number).padStart(4, "0")} fue recibido. Código de seguimiento: ${order.tracking_token}. Total: ${Number(order.total).toFixed(2)}.`,
     html: `
@@ -111,6 +115,11 @@ async function sendOrderConfirmationEmail(order: any) {
         <h2>VidaBajoAgua</h2>
         <h1>¡Pedido recibido!</h1>
         <p>Hola ${customer.first_name ?? "cliente"}, hemos recibido correctamente tu pedido.</p>
+        ${order.recipient_is_other ? `
+          <h3>Datos de quien recibirá el pedido</h3>
+          <p><strong>Nombre:</strong> ${order.recipient_first_name} ${order.recipient_last_name}</p>
+          <p><strong>Teléfono:</strong> ${order.recipient_phone}</p>
+        ` : ""}
         <p><strong>Número de pedido:</strong> #${String(order.order_number).padStart(4, "0")}</p>
         <p><strong>Código de seguimiento:</strong> ${order.tracking_token}</p>
         <hr />
@@ -120,6 +129,7 @@ async function sendOrderConfirmationEmail(order: any) {
         <p><strong>Envío:</strong> ${Number(order.shipping_cost).toFixed(2)}</p>
         <p style="font-size:18px;"><strong>Total:</strong> ${Number(order.total).toFixed(2)}</p>
         <p><strong>Método de pago:</strong> ${payment?.payment_method ?? "No especificado"}</p>
+        ${order.additional_email ? `<p>Esta confirmación también fue enviada a ${order.additional_email}.</p>` : ""}
         ${transferHtml}
         ${cashHtml}
         <hr />
@@ -266,7 +276,15 @@ export async function createPendingOrder(
             subtotal,
             shipping_cost,
             total,
-            customers (first_name, email),
+            buyer_first_name,
+            buyer_last_name,
+            buyer_email,
+            buyer_phone,
+            recipient_is_other,
+            recipient_first_name,
+            recipient_last_name,
+            recipient_phone,
+            additional_email,
             order_items (product_name, quantity, subtotal),
             payments (payment_method)
           `)
