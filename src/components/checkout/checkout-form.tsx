@@ -23,6 +23,7 @@ import { calculateShipping } from "@/lib/shipping/calculate-shipping";
 import {
   getShippingSettings,
   getShippingCoverage,
+  getPaymentSettings,
 } from "@/app/checkout/shipping-actions";
 import { useCart } from "@/components/cart/cart-context";
 import { CartSummary } from "@/components/cart/cart-summary";
@@ -77,6 +78,9 @@ const [isAuthenticated, setIsAuthenticated] =
   useState<ShippingSettings | null>(null);
 
 const [shippingLoading, setShippingLoading] =
+  useState(true);
+
+const [transferEnabled, setTransferEnabled] =
   useState(true);
 
 type ShippingCoverage = {
@@ -173,6 +177,24 @@ function handleSelectAddress(address: CheckoutAddress) {
   }
 
   loadShippingSettings();
+
+  async function loadPaymentSettings() {
+    try {
+      const result = await getPaymentSettings();
+      if (!active) return;
+
+      if (result.success && result.settings) {
+        setTransferEnabled(result.settings.transfer_enabled);
+        if (!result.settings.transfer_enabled && payment === "transferencia") {
+          setPayment("efectivo");
+        }
+      }
+    } catch (error) {
+      console.error("[CHECKOUT PAYMENT]", error);
+    }
+  }
+
+  loadPaymentSettings();
 
   return () => {
     active = false;
@@ -655,6 +677,7 @@ const total =
               <PaymentSelector
                 value={payment}
                 onChange={setPayment}
+                transferEnabled={transferEnabled}
               />
             </div>
 
