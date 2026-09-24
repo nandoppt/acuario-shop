@@ -28,7 +28,10 @@ import {
 import { useCart } from "@/components/cart/cart-context";
 import { CartSummary } from "@/components/cart/cart-summary";
 import { PaymentSelector } from "@/components/checkout/payment-selector";
-import { createPendingOrder } from "@/app/checkout/checkout-actions";
+import {
+  createPendingOrder,
+  getMyCheckoutProfile,
+} from "@/app/checkout/checkout-actions";
 
 type PaymentMethod =
   | "transferencia"
@@ -110,7 +113,10 @@ const [coverageLoading, setCoverageLoading] =
     address: "",
     reference: "",
     notes: "",
-    
+    recipient_first_name: "",
+    recipient_last_name: "",
+    recipient_phone: "",
+    additional_email: "",
   });
 
   function updateField(
@@ -256,6 +262,25 @@ useEffect(() => {
 
   loadAddresses();
 
+  async function loadCheckoutProfile() {
+    try {
+      const result = await getMyCheckoutProfile();
+      if (!active || !result.success || !result.profile) return;
+
+      setForm((current) => ({
+        ...current,
+        first_name: result.profile!.first_name,
+        last_name: result.profile!.last_name,
+        email: result.profile!.email,
+        phone: result.profile!.phone,
+      }));
+    } catch (error) {
+      console.error("[CHECKOUT PROFILE]", error);
+    }
+  }
+
+  loadCheckoutProfile();
+
   return () => {
     active = false;
   };
@@ -381,6 +406,26 @@ const total =
       return;
     }
 
+    if (recipientIsOther) {
+      if (
+        !form.recipient_first_name.trim() ||
+        !form.recipient_last_name.trim() ||
+        !form.recipient_phone.trim()
+      ) {
+        setError("Completa los datos de la persona que recibirá el pedido.");
+        return;
+      }
+    }
+
+    if (
+      additionalEmailEnabled &&
+      form.additional_email.trim() &&
+      !form.additional_email.includes("@")
+    ) {
+      setError("Ingresa un correo adicional válido.");
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -394,6 +439,11 @@ const total =
           shipping_cost: shippingCost ?? 0,
 
           notes: form.notes,
+          recipient_is_other: recipientIsOther,
+          recipient_first_name: recipientIsOther ? form.recipient_first_name : "",
+          recipient_last_name: recipientIsOther ? form.recipient_last_name : "",
+          recipient_phone: recipientIsOther ? form.recipient_phone : "",
+          additional_email: additionalEmailEnabled ? form.additional_email : "",
 
           items: items.map((item) => ({
             product_id:
@@ -550,6 +600,86 @@ const total =
                 placeholder="Correo electrónico"
                 className="h-12 rounded-xl border border-border bg-background px-4"
               />
+            </div>
+          <div className="mt-5 rounded-xl border border-border bg-background p-4">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={recipientIsOther}
+                  onChange={(event) => setRecipientIsOther(event.target.checked)}
+                  className="mt-1 h-4 w-4"
+                />
+                <span>
+                  <span className="block text-sm font-medium">
+                    ¿El pedido será recibido por otra persona?
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    Si es un regalo o lo recibirá otra persona, agrega sus datos.
+                  </span>
+                </span>
+              </label>
+
+              {recipientIsOther && (
+                <div className="mt-4 grid gap-3 border-t border-border pt-4 md:grid-cols-2">
+                  <input
+                    required
+                    value={form.recipient_first_name}
+                    onChange={(e) => updateField("recipient_first_name", e.target.value)}
+                    placeholder="Nombres del destinatario"
+                    className="h-11 rounded-xl border border-border bg-background px-4"
+                  />
+                  <input
+                    required
+                    value={form.recipient_last_name}
+                    onChange={(e) => updateField("recipient_last_name", e.target.value)}
+                    placeholder="Apellidos del destinatario"
+                    className="h-11 rounded-xl border border-border bg-background px-4"
+                  />
+                  <input
+                    required
+                    type="tel"
+                    value={form.recipient_phone}
+                    onChange={(e) => updateField("recipient_phone", e.target.value)}
+                    placeholder="Teléfono del destinatario"
+                    className="h-11 rounded-xl border border-border bg-background px-4"
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 rounded-xl border border-border bg-background p-4">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={additionalEmailEnabled}
+                  onChange={(event) => {
+                    setAdditionalEmailEnabled(event.target.checked);
+                    if (!event.target.checked) {
+                      updateField("additional_email", "");
+                    }
+                  }}
+                  className="mt-1 h-4 w-4"
+                />
+                <span>
+                  <span className="block text-sm font-medium">
+                    ¿Quieres enviar también la confirmación a otro correo?
+                  </span>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    Útil si el pedido es un regalo o alguien más debe recibir la información.
+                  </span>
+                </span>
+              </label>
+
+              {additionalEmailEnabled && (
+                <input
+                  required
+                  type="email"
+                  value={form.additional_email}
+                  onChange={(e) => updateField("additional_email", e.target.value)}
+                  placeholder="Correo adicional"
+                  className="mt-4 h-11 w-full rounded-xl border border-border bg-background px-4"
+                />
+              )}
             </div>
           </section>
 
