@@ -9,16 +9,20 @@ import type { ShippingCalculation } from "@/lib/shipping/calculate-shipping";
 type CartSummaryProps = {
   checkout?: boolean;
   shipping?: ShippingCalculation | null;
+  paymentMethod?: "transferencia" | "efectivo" | "payphone";
 };
 
 export function CartSummary({
   checkout = false,
   shipping = null,
+  paymentMethod,
 }: CartSummaryProps) {
   const { subtotal, itemCount } = useCart();
 
+  const isCash = checkout && paymentMethod === "efectivo";
+
   const shippingCost =
-    shipping?.cost ?? null;
+    isCash ? 0 : shipping?.cost ?? null;
 
   const total =
     shippingCost !== null
@@ -52,7 +56,7 @@ export function CartSummary({
           </span>
         </div>
 
-        {checkout && (
+        {checkout && !isCash && (
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">
               Costo de envío
@@ -68,7 +72,7 @@ export function CartSummary({
           </div>
         )}
 
-        {checkout && shipping?.status === "free" && (
+        {checkout && !isCash && shipping?.status === "free" && (
           <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs leading-5 text-emerald-800">
             Envío gratis en compras de $
             {shipping.free_shipping_minimum.toFixed(2)} o más.
@@ -93,7 +97,7 @@ export function CartSummary({
         </span>
       </div>
 
-      {checkout && shipping?.status === "confirm" && (
+      {checkout && !isCash && shipping?.status === "confirm" && (
         <p className="mt-4 text-xs leading-5 text-muted-foreground">
           El costo de envío será confirmado antes de
           finalizar la entrega.
