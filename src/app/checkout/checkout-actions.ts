@@ -8,6 +8,46 @@ type CheckoutItem = {
   product_id: string;
   quantity: number;
 };
+type CheckoutProfile = {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+};
+
+export async function getMyCheckoutProfile(): Promise<{
+  success: boolean;
+  profile: CheckoutProfile | null;
+}> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { success: false, profile: null };
+  }
+
+  const admin = createAdminClient();
+  const { data: customer, error } = await admin
+    .from("customers")
+    .select("first_name, last_name, email, phone")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+  if (error || !customer) {
+    return { success: false, profile: null };
+  }
+
+  return {
+    success: true,
+    profile: {
+      first_name: customer.first_name ?? "",
+      last_name: customer.last_name ?? "",
+      email: customer.email ?? user.email ?? "",
+      phone: customer.phone ?? "",
+    },
+  };
+}
+
 
 
 async function sendOrderConfirmationEmail(order: any) {
@@ -125,6 +165,11 @@ type CreateOrderInput = {
   notes: string;
   items: CheckoutItem[];
   address_id?: string | null;
+  recipient_is_other: boolean;
+  recipient_first_name: string;
+  recipient_last_name: string;
+  recipient_phone: string;
+  additional_email: string;
 };
 
 export async function createPendingOrder(
@@ -169,7 +214,7 @@ export async function createPendingOrder(
 
     const { data, error } =
   await admin.rpc(
-    "create_pending_order",
+    "create_pending_order_v2",
     {
       p_first_name: input.first_name,
       p_last_name: input.last_name,
@@ -188,6 +233,11 @@ export async function createPendingOrder(
       p_notes: input.notes,
       p_auth_user_id: authUserId,
       p_address_id: input.address_id ?? null,
+      p_recipient_is_other: input.recipient_is_other,
+      p_recipient_first_name: input.recipient_first_name,
+      p_recipient_last_name: input.recipient_last_name,
+      p_recipient_phone: input.recipient_phone,
+      p_additional_email: input.additional_email,
     },
   );
 
