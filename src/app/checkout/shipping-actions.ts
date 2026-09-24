@@ -139,7 +139,19 @@ export async function getPaymentSettings() {
       return { success: false, settings: null, error: "No se pudo cargar la configuración de pagos." };
     }
 
-    return { success: true, settings: data };
+    const { data: accounts, error: accountsError } = await admin
+      .from("payment_accounts")
+      .select("id, bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url")
+      .eq("enabled", true)
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: true });
+
+    if (accountsError) {
+      console.error("[PAYMENT ACCOUNTS]", accountsError);
+      return { success: false, settings: null, error: "No se pudieron cargar las cuentas bancarias." };
+    }
+
+    return { success: true, settings: data, accounts: accounts ?? [] };
   } catch (error) {
     console.error("[PAYMENT SETTINGS]", error);
     return { success: false, settings: null, error: "No se pudo cargar la configuración de pagos." };
