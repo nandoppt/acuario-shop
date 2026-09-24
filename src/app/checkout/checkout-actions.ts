@@ -20,13 +20,12 @@ async function sendOrderConfirmationEmail(order: any) {
   if (!customer?.email) return;
 
   const supabase = createAdminClient();
-  const { data: settings } = await supabase
-    .from("payment_settings")
-    .select(
-      "bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url",
-    )
-    .limit(1)
-    .single();
+  const { data: accounts } = await supabase
+    .from("payment_accounts")
+    .select("bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url")
+    .eq("enabled", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   const transporter = createTransporter();
 
@@ -42,13 +41,17 @@ async function sendOrderConfirmationEmail(order: any) {
     payment?.payment_method === "transferencia"
       ? `
         <h3>Datos para realizar la transferencia</h3>
-        <p><strong>Banco:</strong> ${settings?.bank_name ?? "Por confirmar"}</p>
-        <p><strong>Tipo de cuenta:</strong> ${settings?.account_type ?? "Por confirmar"}</p>
-        <p><strong>Número de cuenta:</strong> ${settings?.account_number ?? "Por confirmar"}</p>
-        <p><strong>Titular:</strong> ${settings?.account_holder ?? "Por confirmar"}</p>
-        <p><strong>Cédula / RUC:</strong> ${settings?.identification ?? "Por confirmar"}</p>
-        <p><strong>Correo para comprobantes:</strong> ${settings?.contact_email ?? "Por confirmar"}</p>
-        ${settings?.qr_url ? `<p><img src="${settings.qr_url}" alt="Código QR de transferencia" style="max-width:220px;border-radius:12px;" /></p>` : ""}
+        ${(accounts ?? []).map((account: any) => `
+          <div style="margin:16px 0;padding:14px;border:1px solid #ddd;border-radius:12px;">
+            <p><strong>${account.bank_name}</strong></p>
+            <p><strong>Tipo:</strong> ${account.account_type}</p>
+            <p><strong>Número:</strong> ${account.account_number}</p>
+            <p><strong>Titular:</strong> ${account.account_holder}</p>
+            ${account.identification ? `<p><strong>Cédula / RUC:</strong> ${account.identification}</p>` : ""}
+            ${account.contact_email ? `<p><strong>Comprobantes:</strong> ${account.contact_email}</p>` : ""}
+            ${account.qr_url ? `<p><img src="${account.qr_url}" alt="Código QR ${account.bank_name}" style="max-width:220px;border-radius:12px;" /></p>` : ""}
+          </div>
+        `).join("")}
       `
       : "";
 
