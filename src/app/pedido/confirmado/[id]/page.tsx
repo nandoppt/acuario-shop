@@ -108,11 +108,18 @@ export default async function PedidoConfirmadoPage({
 
   const { data: paymentSettings } = await supabase
     .from("payment_settings")
+    .select("transfer_enabled")
+    .limit(1)
+    .single();
+
+  const { data: paymentAccounts } = await supabase
+    .from("payment_accounts")
     .select(
       "bank_name, account_type, account_number, account_holder, identification, contact_email, qr_url",
     )
-    .limit(1)
-    .single();
+    .eq("enabled", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
 
   const paymentLabels = {
     transferencia: "Transferencia / QR",
@@ -293,23 +300,26 @@ export default async function PedidoConfirmadoPage({
               "transferencia" && (
               <div className="mt-5 rounded-xl bg-secondary p-4 text-sm leading-6">
                 <p className="font-medium">Completa tu transferencia</p>
-                <div className="mt-4 space-y-2">
-                  <p><strong>Banco:</strong> {paymentSettings?.bank_name ?? "Por confirmar"}</p>
-                  <p><strong>Tipo de cuenta:</strong> {paymentSettings?.account_type ?? "Por confirmar"}</p>
-                  <p><strong>Número de cuenta:</strong> {paymentSettings?.account_number ?? "Por confirmar"}</p>
-                  <p><strong>Titular:</strong> {paymentSettings?.account_holder ?? "Por confirmar"}</p>
-                  <p><strong>Cédula / RUC:</strong> {paymentSettings?.identification ?? "Por confirmar"}</p>
-                  {paymentSettings?.contact_email && (
-                    <p><strong>Comprobantes:</strong> {paymentSettings.contact_email}</p>
+                <div className="mt-4 space-y-4">
+                  {paymentAccounts?.map((account, index) => (
+                    <div key={`${account.bank_name}-${index}`} className="rounded-xl border border-border bg-background p-4">
+                      <p className="font-medium">{account.bank_name}</p>
+                      <div className="mt-2 space-y-1 text-sm text-muted-foreground">
+                        <p><strong>Tipo:</strong> {account.account_type}</p>
+                        <p><strong>Número:</strong> {account.account_number}</p>
+                        <p><strong>Titular:</strong> {account.account_holder}</p>
+                        {account.identification && <p><strong>Cédula / RUC:</strong> {account.identification}</p>}
+                        {account.contact_email && <p><strong>Comprobantes:</strong> {account.contact_email}</p>}
+                      </div>
+                      {account.qr_url && (
+                        <img src={account.qr_url} alt={`Código QR ${account.bank_name}`} className="mt-4 h-40 w-40 rounded-xl border bg-background object-contain p-2" />
+                      )}
+                    </div>
+                  ))}
+                  {(!paymentAccounts || paymentAccounts.length === 0) && (
+                    <p className="text-sm text-muted-foreground">Los datos bancarios serán confirmados por VidaBajoAgua.</p>
                   )}
                 </div>
-                {paymentSettings?.qr_url && (
-                  <img
-                    src={paymentSettings.qr_url}
-                    alt="Código QR de transferencia"
-                    className="mt-5 mx-auto h-56 w-56 rounded-xl border bg-background object-contain p-2"
-                  />
-                )}
               </div>
             )}
 
