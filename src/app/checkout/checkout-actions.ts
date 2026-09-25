@@ -190,7 +190,8 @@ async function sendOrderConfirmationEmail(order: any) {
           <tr><td style="padding:18px 24px 22px;text-align:center;border-top:1px solid #eef1eb;"><div style="font-size:12px;color:#748178;">Conserva tu código de seguimiento para consultar tu pedido.</div><div style="margin-top:5px;font-size:12px;color:#9aa49d;">VidaBajoAgua · Ecuador</div></td></tr>
         </table>
       </div>
-    `,  });
+    `,
+  });
 }
 
 function createTransporter() {
