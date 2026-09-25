@@ -63,11 +63,36 @@ export default function HerramientasPage() {
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {tools.map((tool) => {
             const Icon = tool.icon;
+            if (!tool.available) {
+              return (
+                <div
+                key={tool.title}
+                href={tool.href}
+                className="overflow-hidden rounded-3xl border border-border bg-card opacity-80 shadow-sm"
+                >
+                <div className={`flex h-32 items-center justify-center bg-gradient-to-br ${tool.tone}`}>
+                  <div className="flex size-14 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg">
+                    <Icon className="size-6" strokeWidth={1.8} />
+                  </div>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-center justify-between gap-3">
+                    <h2 className="font-semibold tracking-tight">{tool.title}</h2>
+                    <span className="text-xs text-muted-foreground">En desarrollo</span>
+                  </div>
+                  <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
+                  <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                    "Próximamente"
+                  </span>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={tool.title}
                 href={tool.href}
-                className={`group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition duration-200 ${tool.available ? "hover:-translate-y-1 hover:border-primary/25 hover:shadow-lg" : "opacity-80"}`}
+                className="group overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition duration-200 hover:-translate-y-1 hover:border-primary/25 hover:shadow-lg"
               >
                 <div className={`flex h-32 items-center justify-center bg-gradient-to-br ${tool.tone}`}>
                   <div className="flex size-14 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg">
@@ -77,13 +102,11 @@ export default function HerramientasPage() {
                 <div className="p-5">
                   <div className="flex items-center justify-between gap-3">
                     <h2 className="font-semibold tracking-tight">{tool.title}</h2>
-                    {tool.available && (
-                      <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                    )}
+                    <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                   </div>
                   <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
                   <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                    {tool.available ? "Abrir herramienta" : "Próximamente"}
+                    Abrir herramienta
                   </span>
                 </div>
               </Link>
