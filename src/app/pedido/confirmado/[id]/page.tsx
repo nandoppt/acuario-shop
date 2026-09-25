@@ -11,6 +11,7 @@ import {
   getShippingCostLabel,
   getShippingMethodLabel,
 } from "@/lib/shipping/shipping-method";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 type Props = {
   params: Promise<{
@@ -146,6 +147,8 @@ export default async function PedidoConfirmadoPage({
         ]
       : payment?.payment_method ?? "No especificado";
 
+  const statusMeta = getOrderStatusMeta(order.status);
+
   const shippingMethodLabel = getShippingMethodLabel(
     order.shipping_method,
   );
@@ -213,12 +216,16 @@ export default async function PedidoConfirmadoPage({
           #{String(order.order_number).padStart(4, "0")}
         </p>
 
-        <p className="mt-3 text-sm text-muted-foreground">
-          Estado:{" "}
-          <span className="font-medium text-foreground">
-            Pendiente de pago
+        <div className="mt-4 flex justify-center">
+          <span
+            className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${statusMeta.badgeClass}`}
+          >
+            <span
+              className={`h-2 w-2 rounded-full ${statusMeta.dotClass}`}
+            />
+            {statusMeta.label}
           </span>
-        </p>
+        </div>
       </section>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
