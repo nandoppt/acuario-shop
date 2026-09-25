@@ -3,168 +3,112 @@ import {
   ArrowRight,
   Beaker,
   BookOpen,
+  Calculator,
   Droplets,
   Fish,
-  Gauge,
   Lightbulb,
-  Ruler,
   Sprout,
+  Waves,
 } from "lucide-react";
-
-import { guideCategories, guides } from "@/lib/guides/guides";
 
 export const metadata = {
   title: "Guías de acuarismo",
   description:
-    "Biblioteca de guías y herramientas para aprender, mantener y diseñar tu acuario.",
+    "Biblioteca, herramientas y recursos prácticos para aprender y diseñar tu acuario.",
 };
 
-const tools = [
+const sections = [
   {
-    title: "Calculadora de litraje",
-    description: "Calcula el volumen de tu acuario y úsalo como base para tus decisiones.",
-    href: "/calculadoras/litraje",
-    icon: Gauge,
+    title: "Biblioteca",
+    description: "Guías prácticas sobre ciclado, habitantes, mantenimiento, plantas y aquascaping.",
+    href: "/guias/biblioteca",
+    icon: BookOpen,
+    tone: "from-emerald-600/90 via-emerald-500/80 to-teal-400/80",
+    iconBg: "bg-white/95 text-emerald-700",
+    label: "Leer y aprender",
   },
   {
-    title: "Espesor de vidrio",
-    description: "Herramienta de referencia para estudiar dimensiones y construcción de acuarios.",
-    href: "#proximamente",
-    icon: Ruler,
+    title: "Herramientas",
+    description: "Calculadoras para convertir medidas y tomar decisiones antes de montar tu acuario.",
+    href: "/guias/herramientas",
+    icon: Calculator,
+    tone: "from-sky-600/90 via-cyan-500/80 to-blue-400/80",
+    iconBg: "bg-white/95 text-sky-700",
+    label: "Calcular",
   },
   {
-    title: "Cambio de agua",
-    description: "Calcula rápidamente cuántos litros debes retirar según el porcentaje elegido.",
-    href: "#proximamente",
-    icon: Droplets,
+    title: "Primer acuario",
+    description: "Una ruta sencilla para pasar de un acuario vacío a un sistema estable.",
+    href: "/guias/como-ciclar-un-acuario",
+    icon: Waves,
+    tone: "from-violet-600/90 via-purple-500/80 to-fuchsia-400/80",
+    iconBg: "bg-white/95 text-violet-700",
+    label: "Empezar",
   },
   {
-    title: "Dosis y proporciones",
-    description: "Calculadoras para fertilización y mantenimiento, próximamente.",
-    href: "#proximamente",
-    icon: Beaker,
+    title: "Plantas y habitantes",
+    description: "Consulta rápida de temas que iremos ampliando con fichas y recomendaciones.",
+    href: "/guias/biblioteca#temas",
+    icon: Fish,
+    tone: "from-amber-500/95 via-orange-400/85 to-rose-400/80",
+    iconBg: "bg-white/95 text-amber-700",
+    label: "Explorar temas",
   },
 ];
 
-const quickTopics = [
-  { label: "Plantas", icon: Sprout },
-  { label: "Camarones", icon: Fish },
-  { label: "Iluminación", icon: Lightbulb },
-  { label: "Agua", icon: Droplets },
+const quickLinks = [
+  { title: "Ciclado", href: "/guias/como-ciclar-un-acuario", icon: Beaker },
+  { title: "Aquascaping", href: "/guias/principios-del-aquascaping", icon: Sprout },
+  { title: "Iluminación", href: "/guias/iluminacion-para-plantas", icon: Lightbulb },
+  { title: "Cambios de agua", href: "/guias/cambios-de-agua", icon: Droplets },
 ];
 
 export default function GuiasPage() {
   return (
-    <main className="min-h-screen">
-      <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-20">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
-            VidaBajoAgua · Biblioteca
-          </p>
-          <div className="mt-4 max-w-3xl">
-            <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+    <main className="min-h-screen bg-background">
+      <section className="relative overflow-hidden border-b border-border">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(75,130,104,0.16),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(51,133,166,0.14),transparent_28%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-18">
+          <div className="max-w-3xl">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
+              VidaBajoAgua · Centro de conocimiento
+            </p>
+            <h1 className="mt-4 text-4xl font-semibold tracking-tight md:text-6xl">
               Aprende. Calcula. Diseña.
             </h1>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
-              Una biblioteca de acuarismo pensada para acompañarte desde el primer
-              montaje hasta los detalles que hacen especial un aquascape.
-            </p>
-          </div>
-          <div className="mt-8 flex flex-wrap gap-2">
-            {guideCategories.map((category) => (
-              <a
-                key={category}
-                href={category === "Todas" ? "#biblioteca" : "#" + category.toLowerCase()}
-                className="rounded-full border border-border bg-background px-4 py-2 text-sm transition hover:border-primary/30 hover:bg-primary/5"
-              >
-                {category}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="biblioteca" className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-18">
-        <div className="flex items-end justify-between gap-6">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Biblioteca
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
-              Guías para avanzar con criterio
-            </h2>
-          </div>
-          <BookOpen className="hidden size-7 text-primary/60 sm:block" />
-        </div>
-
-        <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {guides.map((guide) => (
-            <Link
-              key={guide.slug}
-              href={"/guias/" + guide.slug}
-              className="group flex min-h-64 flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-lg"
-            >
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-xs font-medium uppercase tracking-[0.16em] text-primary">
-                  {guide.category}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {guide.readingTime}
-                </span>
-              </div>
-              <h3 className="mt-6 text-xl font-semibold tracking-tight">
-                {guide.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                {guide.excerpt}
-              </p>
-              <div className="mt-auto flex items-center justify-between pt-6 text-sm font-medium text-primary">
-                <span>{guide.difficulty}</span>
-                <span className="inline-flex items-center gap-1">
-                  Leer guía
-                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="border-y border-border bg-muted/20">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:px-8 md:py-18">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-              Herramientas
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
-              El acuarismo también se puede calcular
-            </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-muted-foreground">
-              Pequeñas herramientas para convertir medidas y decisiones en datos
-              útiles antes de montar, mantener o modificar tu acuario.
+            <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground md:text-lg">
+              Todo lo que necesitas para entender mejor tu acuario, reunido en un solo lugar.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {tools.map((tool) => {
-              const Icon = tool.icon;
-              const enabled = tool.href.startsWith("/");
-              const className = enabled
-                ? "group rounded-2xl border border-border bg-card p-5 transition hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-md"
-                : "cursor-default rounded-2xl border border-border bg-card p-5 opacity-75";
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {sections.map((section) => {
+              const Icon = section.icon;
               return (
-                <Link key={tool.title} href={tool.href} className={className}>
-                  <div className="flex size-10 items-center justify-center rounded-xl bg-primary/8 text-primary">
-                    <Icon className="size-5" />
+                <Link
+                  key={section.title}
+                  href={section.href}
+                  className="group overflow-hidden rounded-3xl border border-white/50 bg-card shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className={`relative flex h-36 items-center justify-center overflow-hidden bg-gradient-to-br ${section.tone}`}>
+                    <div className="absolute -right-8 -top-10 size-32 rounded-full bg-white/10" />
+                    <div className="absolute -bottom-12 -left-8 size-36 rounded-full bg-black/5" />
+                    <div className={`relative flex size-16 items-center justify-center rounded-full shadow-lg ${section.iconBg}`}>
+                      <Icon className="size-7" strokeWidth={1.8} />
+                    </div>
                   </div>
-                  <h3 className="mt-5 text-base font-semibold">{tool.title}</h3>
-                  <p className="mt-2 text-sm leading-5 text-muted-foreground">
-                    {tool.description}
-                  </p>
-                  <span className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-primary">
-                    {enabled ? "Abrir herramienta" : "Próximamente"}
-                    {enabled && <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />}
-                  </span>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h2 className="text-lg font-semibold tracking-tight">{section.title}</h2>
+                      <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground">
+                      {section.description}
+                    </p>
+                    <span className="mt-4 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                      {section.label}
+                    </span>
+                  </div>
                 </Link>
               );
             })}
@@ -172,36 +116,42 @@ export default function GuiasPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-8">
-        <div className="rounded-3xl border border-primary/15 bg-primary/[0.035] p-7 md:p-10">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
-            Consulta rápida
-          </p>
-          <div className="mt-3 flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">
-                Encuentra tu próximo tema
-              </h2>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-                La biblioteca crecerá con fichas de plantas, habitantes,
-                iluminación, agua y problemas frecuentes del acuario.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {quickTopics.map((topic) => {
-                const Icon = topic.icon;
-                return (
-                  <div
-                    key={topic.label}
-                    className="flex items-center gap-2 rounded-xl border border-border bg-background px-3 py-2 text-sm"
-                  >
-                    <Icon className="size-4 text-primary" />
-                    {topic.label}
-                  </div>
-                );
-              })}
-            </div>
+      <section className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
+              Acceso rápido
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
+              ¿Qué estás buscando?
+            </h2>
           </div>
+          <Link
+            href="/guias/biblioteca"
+            className="hidden items-center gap-1 text-sm font-medium text-primary sm:flex"
+          >
+            Ver biblioteca
+            <ArrowRight className="size-4" />
+          </Link>
+        </div>
+
+        <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {quickLinks.map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group flex items-center gap-3 rounded-2xl border border-border bg-card p-4 transition hover:border-primary/25 hover:shadow-sm"
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/8 text-primary">
+                  <Icon className="size-5" />
+                </div>
+                <span className="text-sm font-medium">{item.title}</span>
+                <ArrowRight className="ml-auto size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+              </Link>
+            );
+          })}
         </div>
       </section>
     </main>
