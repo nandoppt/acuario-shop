@@ -184,3 +184,58 @@
     font-family: var(--font-manrope), sans-serif;
   }
 }
+
+/* VidaBajoAgua — unified order experience */
+@layer components {
+  .order-surface {
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: var(--card);
+    box-shadow: 0 1px 2px rgb(20 35 28 / 4%);
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .order-surface:hover {
+    border-color: color-mix(in oklab, var(--border) 75%, var(--primary));
+    box-shadow: 0 8px 24px rgb(20 35 28 / 6%);
+  }
+
+  .order-section {
+    border: 1px solid var(--border);
+    border-radius: 0.875rem;
+    background: var(--background);
+  }
+
+  .order-kicker {
+    color: var(--muted-foreground);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .order-total {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  .order-status-pulse {
+    animation: order-status-pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes order-status-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 0 0 4px color-mix(in oklab, currentColor 10%, transparent); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .order-surface,
+    .order-status-pulse {
+      animation: none;
+      transition: none;
+    }
+  }
+}
