@@ -7,6 +7,7 @@ import {
   getShippingCostLabel,
   getShippingMethodLabel,
 } from "@/lib/shipping/shipping-method";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 type Order = {
   id: string;
@@ -55,6 +56,7 @@ export function OrdersAccordion({
     <div className="mt-10 space-y-3">
       {orders.map((order) => {
         const isOpen = openOrderId === order.id;
+        const statusMeta = getOrderStatusMeta(order.status);
 
         return (
           <article
@@ -66,7 +68,7 @@ export function OrdersAccordion({
               onClick={() =>
                 setOpenOrderId(isOpen ? null : order.id)
               }
-              className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-muted/40 sm:p-6"
+              className="flex w-full items-center justify-between gap-4 p-5 text-left transition-colors hover:bg-muted/40 active:bg-muted/60 sm:p-6"
               aria-expanded={isOpen}
             >
               <div className="min-w-0">
@@ -80,8 +82,13 @@ export function OrdersAccordion({
               </div>
 
               <div className="flex shrink-0 items-center gap-3">
-                <span className="inline-flex rounded-full border border-border px-3 py-1 text-xs font-medium capitalize">
-                  {order.status}
+                <span
+                  className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusMeta.badgeClass}`}
+                >
+                  <span
+                    className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`}
+                  />
+                  {statusMeta.label}
                 </span>
 
                 <ChevronDown
