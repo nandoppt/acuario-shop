@@ -67,7 +67,6 @@ export default function HerramientasPage() {
               return (
                 <div
                 key={tool.title}
-                href={tool.href}
                 className="overflow-hidden rounded-3xl border border-border bg-card opacity-80 shadow-sm"
                 >
                 <div className={`flex h-32 items-center justify-center bg-gradient-to-br ${tool.tone}`}>
@@ -82,7 +81,7 @@ export default function HerramientasPage() {
                   </div>
                   <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
                   <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                    "Próximamente"
+                    Próximamente
                   </span>
                 </div>
               );
