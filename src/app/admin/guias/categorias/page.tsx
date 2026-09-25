@@ -19,7 +19,7 @@ export default async function GuideCategoriesPage(){
     </form>
     <div className="overflow-hidden rounded-2xl border border-border bg-background divide-y divide-border">
       {(categories??[]).map((category)=><div key={category.id} className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
-        <div><div className="flex items-center gap-2"><h2 className="font-semibold">{category.name}</h2><span className={`rounded-full px-2.5 py-1 text-xs font-medium \${category.is_active?"bg-primary/10 text-primary":"bg-muted text-muted-foreground"}`}>{category.is_active?"Activa":"Inactiva"}</span></div><p className="mt-1 text-sm text-muted-foreground">{category.description||"Sin descripción"} · /{category.slug}</p></div>
+        <div><div className="flex items-center gap-2"><h2 className="font-semibold">{category.name}</h2><span className={`rounded-full px-2.5 py-1 text-xs font-medium ${category.is_active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{category.is_active?"Activa":"Inactiva"}</span></div><p className="mt-1 text-sm text-muted-foreground">{category.description||"Sin descripción"} · /{category.slug}</p></div>
         <form action={toggleGuideCategory.bind(null,category.id,!category.is_active)}><button className="rounded-xl border border-border px-4 py-2 text-sm font-medium hover:bg-muted">{category.is_active?"Desactivar":"Activar"}</button></form>
       </div>)}
     </div>
