@@ -7,6 +7,10 @@ import {
 } from "lucide-react";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  getShippingCostLabel,
+  getShippingMethodLabel,
+} from "@/lib/shipping/shipping-method";
 
 type Props = {
   params: Promise<{
@@ -31,6 +35,7 @@ export default async function PedidoConfirmadoPage({
           status,
           subtotal,
           shipping_cost,
+          shipping_method,
           total,
           created_at,
           notes,
@@ -140,6 +145,15 @@ export default async function PedidoConfirmadoPage({
           payment.payment_method as keyof typeof paymentLabels
         ]
       : payment?.payment_method ?? "No especificado";
+
+  const shippingMethodLabel = getShippingMethodLabel(
+    order.shipping_method,
+  );
+
+  const shippingCostLabel = getShippingCostLabel(
+    order.shipping_method,
+    Number(order.shipping_cost) || 0,
+  );
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-12 md:px-8 md:py-16">
@@ -261,20 +275,25 @@ export default async function PedidoConfirmadoPage({
               </span>
             </div>
 
-            {payment?.payment_method !== "efectivo" && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">
-                  Envío
-                </span>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                Método de envío
+              </span>
 
-                <span>
-                  $
-                  {Number(
-                    order.shipping_cost,
-                  ).toFixed(2)}
-                </span>
-              </div>
-            )}
+              <span className="text-right font-medium">
+                {shippingMethodLabel}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                Costo de envío
+              </span>
+
+              <span className="text-right">
+                {shippingCostLabel}
+              </span>
+            </div>
 
             <div className="flex justify-between border-t border-border pt-4 text-lg font-semibold">
               <span>Total</span>
