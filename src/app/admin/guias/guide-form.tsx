@@ -55,10 +55,10 @@ export function GuideForm({ action, categories, authors, initial }: Props) {
     initial?.sources ?? [],
   );
 
-  function updateSection(
+  function updateSection<K extends keyof Section>(
     index: number,
-    field: keyof Section,
-    value: string,
+    field: K,
+    value: Section[K],
   ) {
     setSections((current) =>
       current.map((section, i) =>
@@ -82,7 +82,11 @@ export function GuideForm({ action, categories, authors, initial }: Props) {
     );
   }
 
-  function updateSource(index: number, field: keyof Source, value: string) {
+  function updateSource<K extends keyof Source>(
+    index: number,
+    field: K,
+    value: Source[K],
+  ) {
     setSources((current) =>
       current.map((source, i) =>
         i === index ? { ...source, [field]: value } : source,
@@ -371,7 +375,7 @@ export function GuideForm({ action, categories, authors, initial }: Props) {
                 <select
                   value={section.block_type}
                   onChange={(e) =>
-                    updateSection(index, "block_type", e.target.value)
+                    updateSection(index, "block_type", e.target.value as Section["block_type"])
                   }
                   className={inputClass}
                 >
@@ -491,7 +495,7 @@ export function GuideForm({ action, categories, authors, initial }: Props) {
                 <select
                   value={source.source_type}
                   onChange={(e) =>
-                    updateSource(index, "source_type", e.target.value)
+                    updateSource(index, "source_type", e.target.value as Source["source_type"])
                   }
                   className={inputClass}
                 >
