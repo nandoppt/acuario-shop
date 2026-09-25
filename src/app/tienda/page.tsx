@@ -66,16 +66,16 @@ export default async function TiendaPage({
   return (
     <div className="min-h-screen">
       <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-5">
-          <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
+        <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-5">
+          <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
             VidaBajoAgua
           </p>
 
-          <h1 className="mt-1.5 text-2xl font-semibold tracking-tight">
+          <h1 className="mt-1.5 text-2xl font-semibold tracking-tight md:text-3xl">
             Nuestra tienda
           </h1>
 
-          <p className="mt-1.5 max-w-2xl text-xs leading-5 text-muted-foreground">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
             Todo lo necesario para crear, cuidar y disfrutar un mundo acuático lleno de vida.
           </p>
         </div>
@@ -99,23 +99,23 @@ export default async function TiendaPage({
   </div>
 </section>
 
-      <section className="bg-muted/20 py-6 md:py-8">
+      <section className="py-10 md:py-14">
   <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-            <h2 className="text-xs font-medium">
+          <div className="mb-8">
+            <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
               Catálogo
-            </h2>
+            </p>
 
-            <div className="flex items-baseline gap-2 md:gap-3">
-              <h3 className="text-xs font-medium tracking-tight">
+            <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+              <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
                 {searchTerm
                   ? `Resultados para "${params.busqueda}"`
                   : selectedCategory
                     ? `Productos de ${categoryLabel}`
                     : "Todos los productos"}
-              </h3>
+              </h2>
 
-              <p className="shrink-0 text-[10px] font-medium text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {filteredProducts.length}{" "}
                 {filteredProducts.length === 1
                   ? "producto disponible"
