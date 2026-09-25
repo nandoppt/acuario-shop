@@ -221,7 +221,7 @@ export default async function PedidoConfirmadoPage({
             className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${statusMeta.badgeClass}`}
           >
             <span
-              className={`h-2 w-2 rounded-full ${statusMeta.dotClass}`}
+              className={`h-2 w-2 rounded-full ${statusMeta.dotClass} ${order.status === "pending" ? "order-status-pulse" : ""}`}
             />
             {statusMeta.label}
           </span>
@@ -232,7 +232,7 @@ export default async function PedidoConfirmadoPage({
 
         {/* Productos */}
 
-        <section className="rounded-2xl border border-border bg-card p-6">
+        <section className="order-surface p-6">
           <h2 className="text-xl font-semibold">
             Resumen del pedido
           </h2>
