@@ -6,6 +6,7 @@ import {
   Truck,
   XCircle,
 } from "lucide-react";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 type TrackedOrderDetailsProps = {
   order: any;
@@ -81,6 +82,7 @@ export function TrackedOrderDetails({
           : formatCurrency(order.shipping_cost);
 
   const currentStatus = order.status ?? null;
+  const currentStatusMeta = getOrderStatusMeta(currentStatus);
 
   const currentStatusIndex = currentStatus
     ? statusOrder.indexOf(currentStatus)
@@ -109,9 +111,20 @@ export function TrackedOrderDetails({
           </div>
         ) : (
           <div className="rounded-xl border bg-background p-5">
-            <h3 className="text-lg font-semibold">
-              Estado del pedido
-            </h3>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-lg font-semibold">
+                Estado del pedido
+              </h3>
+
+              <span
+                className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${currentStatusMeta.badgeClass}`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${currentStatusMeta.dotClass} motion-safe:animate-pulse motion-reduce:animate-none`}
+                />
+                {currentStatusMeta.label}
+              </span>
+            </div>
 
             <div className="mt-6 space-y-6">
               {timeline.map((step, index) => {
@@ -136,9 +149,11 @@ export function TrackedOrderDetails({
                       <div
                         className={[
                           "flex h-9 w-9 shrink-0 items-center justify-center rounded-full border",
-                          completed
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-background text-muted-foreground",
+                          current
+                            ? `${currentStatusMeta.dotClass} text-white shadow-sm motion-safe:animate-pulse motion-reduce:animate-none`
+                            : completed
+                              ? "bg-emerald-500 text-white dark:bg-emerald-400"
+                              : "bg-background text-muted-foreground",
                         ].join(" ")}
                       >
                         {completed ? (
@@ -155,7 +170,7 @@ export function TrackedOrderDetails({
                             "mt-2 h-8 w-px",
                             currentStatusIndex >
                             stepIndex
-                              ? "bg-primary"
+                              ? "bg-emerald-500 dark:bg-emerald-400"
                               : "bg-border",
                           ].join(" ")}
                         />
