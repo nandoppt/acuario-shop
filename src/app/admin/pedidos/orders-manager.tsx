@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getShippingCostLabel, getShippingMethodLabel } from "@/lib/shipping/shipping-method";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 import {
   ChevronDown,
   CreditCard,
@@ -84,57 +85,6 @@ function formatDate(value: string) {
     minute: "2-digit",
     hour12: false,
   }).format(date);
-}
-
-function getOrderStatusLabel(status: string) {
-  const labels: Record<string, string> = {
-    pending: "Pendiente",
-    confirmed: "Confirmado",
-    preparing: "Preparando",
-    shipped: "Enviado",
-    delivered: "Entregado",
-    cancelled: "Cancelado",
-  };
-
-  return labels[status] ?? status;
-}
-
-function getPaymentStatusLabel(status: string) {
-  const labels: Record<string, string> = {
-    pending: "Pendiente",
-    waiting_verification: "Por verificar",
-    paid: "Pagado",
-    rejected: "Rechazado",
-    refunded: "Reembolsado",
-  };
-
-  return labels[status] ?? status;
-}
-
-function getPaymentMethodLabel(method: string) {
-  const labels: Record<string, string> = {
-    transferencia: "Transferencia / QR",
-    efectivo: "Efectivo",
-    payphone: "PayPhone",
-  };
-
-  return labels[method] ?? method;
-}
-
-function orderStatusClass(status: string) {
-  if (status === "confirmed") {
-    return "bg-primary/10 text-primary";
-  }
-
-  if (status === "cancelled") {
-    return "bg-destructive/10 text-destructive";
-  }
-
-  if (status === "delivered") {
-    return "bg-primary/10 text-primary";
-  }
-
-  return "bg-secondary text-foreground";
 }
 
 function paymentStatusClass(status: string) {
@@ -485,13 +435,12 @@ export function OrdersManager({
                         </h2>
 
                         <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-medium ${orderStatusClass(
-                            order.status,
-                          )}`}
+                          className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(order.status).badgeClass}`}
                         >
-                          {getOrderStatusLabel(
-                            order.status,
-                          )}
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(order.status).dotClass}`}
+                          />
+                          {getOrderStatusMeta(order.status).label}
                         </span>
 
                         {payment && (
