@@ -241,7 +241,7 @@ export function CatalogSearch({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Buscar plantas, filtros, iluminación..."
-            className={`w-full border border-border bg-background text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 ${
+            className={`w-full border border-border/80 bg-background/95 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary/10 ${
               compact
                 ? "h-9 rounded-full pl-9 pr-9"
                 : "h-10 rounded-xl pl-10 pr-10"
@@ -266,7 +266,7 @@ export function CatalogSearch({
       </form>
 
       {isOpen && suggestions.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-background shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-xl border border-border bg-background shadow-xl shadow-primary/5">
           {suggestions.map((product, index) => {
             const isHighlighted =
               index === highlightedIndex;
