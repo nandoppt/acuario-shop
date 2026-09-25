@@ -15,6 +15,7 @@ import {
   requestOrderVerificationCode,
   verifyOrderVerificationCode,
 } from "../order-search-actions";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 type SearchResult = Awaited<
   ReturnType<typeof getOrderByTrackingToken>
@@ -663,7 +664,7 @@ const handleVerificationSubmit = async (
                   )
                 }
                 aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-muted/30 md:px-6"
+                className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-muted/30 active:bg-muted/50 md:px-6"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
@@ -674,11 +675,13 @@ const handleVerificationSubmit = async (
                       ).padStart(4, "0")}
                     </p>
 
-                    <span className="rounded-full border px-2.5 py-1 text-xs font-medium">
-                      {statusLabels[
-                        customerOrder.status
-                      ] ??
-                        customerOrder.status}
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(customerOrder.status).badgeClass}`}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(customerOrder.status).dotClass}`}
+                      />
+                      {getOrderStatusMeta(customerOrder.status).label}
                     </span>
                   </div>
 
