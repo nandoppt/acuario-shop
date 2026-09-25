@@ -38,7 +38,7 @@ export default async function GuidePage({ params }: Props) {
         <p className="mt-4 text-sm text-muted-foreground">Por <span className="font-medium text-foreground">{guide.author_name}</span></p>
       </header>
       <div className="grid gap-8 pt-9 md:grid-cols-[1fr_220px]">
-        <div className="space-y-9">{guide.sections.map((section) => <section key={section.id}><h2 className="text-2xl font-semibold tracking-tight">{section.heading}</h2><div className="mt-4 space-y-4">{section.content.split("\\n").filter(Boolean).map((paragraph,index)=><p key={index} className="text-base leading-8 text-muted-foreground">{paragraph}</p>)}</div></section>)}</div>
+        <div className="space-y-9">{guide.sections.map((section: { id: string; heading: string; content: string }) => <section key={section.id}><h2 className="text-2xl font-semibold tracking-tight">{section.heading}</h2><div className="mt-4 space-y-4">{section.content.split("\\n").filter(Boolean).map((paragraph: string, index: number) => <p key={index} className="text-base leading-8 text-muted-foreground">{paragraph}</p>)}</div></section>)}</div>
         <aside className="h-fit rounded-2xl border border-border bg-muted/25 p-5 md:sticky md:top-6"><BookOpen className="size-5 text-primary" /><p className="mt-4 text-xs font-medium uppercase tracking-[0.16em] text-primary">Esta guía</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Nivel {guide.difficulty}. Pensada como referencia práctica para complementar tu experiencia y tus observaciones del acuario.</p><Link href="/calculadoras/litraje" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-primary">Abrir calculadora de litraje<ArrowRight className="size-4" /></Link></aside>
       </div>
     </article></main>
