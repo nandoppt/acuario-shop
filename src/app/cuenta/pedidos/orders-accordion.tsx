@@ -61,7 +61,7 @@ export function OrdersAccordion({
         return (
           <article
             key={order.id}
-            className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
+            className="order-surface overflow-hidden"
           >
             <button
               type="button"
@@ -86,7 +86,7 @@ export function OrdersAccordion({
                   className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusMeta.badgeClass}`}
                 >
                   <span
-                    className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass} ${order.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
+                    className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass} ${order.status === "pending" ? "order-status-pulse" : ""}`}
                   />
                   {statusMeta.label}
                 </span>
@@ -172,7 +172,7 @@ export function OrdersAccordion({
                       Total
                     </span>
 
-                    <span className="text-lg font-semibold">
+                    <span className="order-total text-lg font-semibold">
                       {formatCurrency(
                         Number(order.total),
                       )}

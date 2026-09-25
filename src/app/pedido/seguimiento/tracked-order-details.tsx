@@ -92,7 +92,7 @@ export function TrackedOrderDetails({
     <div className="border-t border-border">
       <div className="space-y-6 p-5 md:p-6">
         {order.status === "cancelled" ? (
-          <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-6">
+          <div className="order-section border-destructive/30 bg-destructive/5 p-6">
             <div className="flex items-start gap-3">
               <XCircle className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
 
@@ -110,9 +110,9 @@ export function TrackedOrderDetails({
             </div>
           </div>
         ) : (
-          <div className="rounded-xl border bg-background p-5">
+          <div className="order-section p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold">
+              <h3 className="order-total text-lg font-semibold">
                 Estado del pedido
               </h3>
 
@@ -120,7 +120,7 @@ export function TrackedOrderDetails({
                 className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-medium ${currentStatusMeta.badgeClass}`}
               >
                 <span
-                  className={`h-1.5 w-1.5 rounded-full ${currentStatusMeta.dotClass} motion-safe:animate-pulse motion-reduce:animate-none`}
+                  className={`h-1.5 w-1.5 rounded-full ${currentStatusMeta.dotClass} ${currentStatus === "pending" ? "order-status-pulse" : ""}`}
                 />
                 {currentStatusMeta.label}
               </span>

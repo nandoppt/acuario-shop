@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpen,
   Boxes,
   CheckCircle2,
   Clock3,
@@ -583,6 +584,17 @@ export default async function AdminPage() {
 
             <p className="mt-2 text-sm text-muted-foreground">
               Organizar el catálogo.
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/guias"
+            className="group rounded-2xl border border-border bg-background p-6 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <BookOpen className="text-primary" size={22} />
+            <h3 className="mt-5 font-semibold">Guías</h3>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Crear y editar la biblioteca de acuarismo.
             </p>
           </Link>
 

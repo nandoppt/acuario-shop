@@ -218,7 +218,7 @@ export default async function OrderDetailPage({
               className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${statusMeta.badgeClass}`}
             >
               <span
-                className={`h-2 w-2 rounded-full ${statusMeta.dotClass}`}
+                className={`h-2 w-2 rounded-full ${statusMeta.dotClass} ${order.status === "pending" ? "order-status-pulse" : ""}`}
               />
               {statusMeta.label}
             </span>
@@ -242,7 +242,7 @@ export default async function OrderDetailPage({
 
           {/* Productos */}
 
-          <section className="rounded-2xl border border-border bg-card">
+          <section className="order-surface overflow-hidden">
             <div className="border-b border-border p-6">
               <div className="flex items-center gap-3">
                 <Package
@@ -357,7 +357,7 @@ export default async function OrderDetailPage({
                 </span>
               </div>
 
-              <div className="flex justify-between border-t border-border pt-4 text-lg font-semibold">
+              <div className="order-total flex justify-between border-t border-border pt-4 text-lg font-semibold">
                 <span>Total</span>
 
                 <span>
@@ -372,7 +372,7 @@ export default async function OrderDetailPage({
 
           {/* Cliente */}
 
-          <section className="rounded-2xl border border-border bg-card p-6">
+          <section className="order-surface p-6">
             <div className="flex items-center gap-3">
               <User
                 size={20}
@@ -509,7 +509,7 @@ export default async function OrderDetailPage({
                     Monto
                   </p>
 
-                  <p className="mt-1 text-2xl font-semibold">
+                  <p className="order-total mt-1 text-2xl font-semibold">
                     $
                     {Number(
                       payment.amount,

@@ -616,129 +616,79 @@ const handleVerificationSubmit = async (
         )}
 
         {customerOrders.length > 1 && (
-            <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="text-lg font-semibold">
-                Pedidos encontrados
-              </h2>
-
+          <div className="order-surface mt-8 overflow-hidden">
+            <div className="border-b border-border px-6 py-5">
+              <p className="order-kicker">Historial</p>
+              <h2 className="mt-1 text-lg font-semibold">Pedidos encontrados</h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                Selecciona el pedido que deseas
-                consultar.
+                Selecciona el pedido que deseas consultar.
               </p>
+            </div>
 
-              <div className="mt-5 divide-y">
-                {customerOrders.length > 0 && (
-  <div className="mt-8 rounded-2xl border border-border bg-card shadow-sm">
-    <div className="border-b px-6 py-5">
-      <h2 className="text-lg font-semibold">
-        {customerOrders.length === 1
-          ? "Pedido encontrado"
-          : "Pedidos encontrados"}
-      </h2>
+            <div className="divide-y divide-border">
+              {customerOrders.map((customerOrder) => {
+                const isOpen = selectedOrderId === customerOrder.id;
+                const statusMeta = getOrderStatusMeta(customerOrder.status);
 
-      <p className="mt-1 text-sm text-muted-foreground">
-        {customerOrders.length === 1
-          ? "Consulta la información de tu pedido."
-          : "Selecciona el pedido que deseas consultar."}
-      </p>
-    </div>
-
-    <div className="divide-y">
-      {customerOrders.map(
-        (customerOrder) => {
-          const isOpen =
-            selectedOrderId ===
-            customerOrder.id;
-
-          return (
-            <div
-              key={customerOrder.id}
-            >
-              <button
-                type="button"
-                onClick={() =>
-                  setSelectedOrderId(
-                    isOpen
-                      ? null
-                      : customerOrder.id,
-                  )
-                }
-                aria-expanded={isOpen}
-                className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-muted/30 active:bg-muted/50 md:px-6"
-              >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold">
-                      Pedido #
-                      {String(
-                        customerOrder.order_number,
-                      ).padStart(4, "0")}
-                    </p>
-
-                    <span
-                      className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(customerOrder.status).badgeClass}`}
+                return (
+                  <div key={customerOrder.id}>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOrderId(isOpen ? null : customerOrder.id)}
+                      aria-expanded={isOpen}
+                      className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-muted/30 active:bg-muted/50 md:px-6"
                     >
-                      <span
-                        className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(customerOrder.status).dotClass} ${customerOrder.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-semibold">
+                            Pedido #{String(customerOrder.order_number).padStart(4, "0")}
+                          </p>
+
+                          <span
+                            className={"inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium " + statusMeta.badgeClass}
+                          >
+                            <span
+                              className={"h-1.5 w-1.5 rounded-full " + statusMeta.dotClass + (customerOrder.status === "pending" ? " order-status-pulse" : "")}
+                            />
+                            {statusMeta.label}
+                          </span>
+                        </div>
+
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {formatDate(customerOrder.created_at)}
+                        </p>
+                      </div>
+
+                      <div className="flex shrink-0 items-center gap-4">
+                        <p className="order-total font-semibold">
+                          {formatCurrency(customerOrder.total)}
+                        </p>
+
+                        <ChevronDown
+                          className={[
+                            "h-5 w-5 text-muted-foreground transition-transform duration-200",
+                            isOpen ? "rotate-180" : "",
+                          ].join(" ")}
+                        />
+                      </div>
+                    </button>
+
+                    {isOpen && (
+                      <TrackedOrderDetails
+                        order={customerOrder}
+                        statusLabels={statusLabels}
+                        paymentLabels={paymentLabels}
+                        paymentStatusLabels={paymentStatusLabels}
+                        timeline={timeline}
+                        statusOrder={statusOrder}
                       />
-                      {getOrderStatusMeta(customerOrder.status).label}
-                    </span>
+                    )}
                   </div>
-
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {formatDate(
-                      customerOrder.created_at,
-                    )}
-                  </p>
-                </div>
-
-                <div className="flex shrink-0 items-center gap-4">
-                  <p className="font-semibold">
-                    {formatCurrency(
-                      customerOrder.total,
-                    )}
-                  </p>
-
-                  <ChevronDown
-                    className={[
-                      "h-5 w-5 text-muted-foreground transition-transform duration-200",
-                      isOpen
-                        ? "rotate-180"
-                        : "",
-                    ].join(" ")}
-                  />
-                </div>
-              </button>
-
-              {isOpen && (
-                <TrackedOrderDetails
-                  order={customerOrder}
-                  statusLabels={
-                    statusLabels
-                  }
-                  paymentLabels={
-                    paymentLabels
-                  }
-                  paymentStatusLabels={
-                    paymentStatusLabels
-                  }
-                  timeline={timeline}
-                  statusOrder={
-                    statusOrder
-                  }
-                />
-              )}
+                );
+              })}
             </div>
-          );
-        },
-      )}
-    </div>
-  </div>
-)}
-              </div>
-            </div>
-          )}
-
+          </div>
+        )}
         <div className="mt-8 flex justify-center">
           <Link
             href="/tienda"
