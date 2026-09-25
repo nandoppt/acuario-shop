@@ -54,7 +54,7 @@ export function CancelOrderButton({
         type="button"
         onClick={handleCancel}
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-destructive/30 px-5 py-3 font-medium text-destructive transition hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-destructive/30 px-5 py-3 font-medium text-destructive transition-all duration-200 hover:-translate-y-0.5 hover:bg-destructive/10 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? (
           <>
