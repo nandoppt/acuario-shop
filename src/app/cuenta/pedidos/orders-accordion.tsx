@@ -86,7 +86,7 @@ export function OrdersAccordion({
                   className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${statusMeta.badgeClass}`}
                 >
                   <span
-                    className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`}
+                    className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass} ${order.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
                   />
                   {statusMeta.label}
                 </span>
