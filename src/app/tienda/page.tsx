@@ -66,8 +66,8 @@ export default async function TiendaPage({
   return (
     <div className="min-h-screen">
       <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-6 md:px-8 md:py-5">
-          <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
+        <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-4">
+          <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
             VidaBajoAgua
           </p>
 
@@ -75,7 +75,7 @@ export default async function TiendaPage({
             Nuestra tienda
           </h1>
 
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+          <p className="mt-1.5 max-w-2xl text-sm leading-5 text-muted-foreground">
             Todo lo necesario para crear, cuidar y disfrutar un mundo acuático lleno de vida.
           </p>
         </div>
@@ -99,15 +99,15 @@ export default async function TiendaPage({
   </div>
 </section>
 
-      <section className="py-10 md:py-14">
+      <section className="py-6 md:py-8">
   <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-8">
+          <div className="mb-5">
             <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
               Catálogo
             </p>
 
             <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-              <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
+              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">
                 {searchTerm
                   ? `Resultados para "${params.busqueda}"`
                   : selectedCategory
