@@ -123,26 +123,25 @@ async function sendOrderConfirmationEmail(order: any) {
   const transferHtml =
     payment?.payment_method === "transferencia"
       ? `
-        <h3>Datos para realizar la transferencia</h3>
-        ${(accounts ?? []).map((account: any) => `
-          <div style="margin:16px 0;padding:14px;border:1px solid #ddd;border-radius:12px;">
-            <p><strong>${account.bank_name}</strong></p>
-            <p><strong>Tipo:</strong> ${account.account_type}</p>
-            <p><strong>Número:</strong> ${account.account_number}</p>
-            <p><strong>Titular:</strong> ${account.account_holder}</p>
-            ${account.identification ? `<p><strong>Cédula / RUC:</strong> ${account.identification}</p>` : ""}
-            ${account.contact_email ? `<p><strong>Comprobantes:</strong> ${account.contact_email}</p>` : ""}
-            ${account.qr_url ? `<p><img src="${account.qr_url}" alt="Código QR ${account.bank_name}" style="max-width:220px;border-radius:12px;" /></p>` : ""}
+        <tr><td style="padding:8px 24px;">
+          <div style="padding:14px 16px;border:1px solid #dfe5dc;border-radius:14px;background:#fbfcf8;">
+            <div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#718078;font-weight:700;">Datos para la transferencia</div>
+            ${(accounts ?? []).map((account: any) => `
+              <div style="margin-top:10px;padding:11px 12px;border:1px solid #e3e8df;border-radius:11px;background:#ffffff;">
+                <div style="font-size:13px;font-weight:700;color:#25352d;">${account.bank_name}</div>
+                <div style="margin-top:4px;font-size:12px;line-height:1.55;color:#66766d;">
+                  ${account.account_type} · ${account.account_number}<br/>
+                  Titular: ${account.account_holder}
+                  ${account.identification ? `<br/>Cédula / RUC: ${account.identification}` : ""}
+                  ${account.contact_email ? `<br/>Comprobantes: ${account.contact_email}` : ""}
+                </div>
+                ${account.qr_url ? `<img src="${account.qr_url}" alt="Código QR ${account.bank_name}" style="display:block;margin-top:9px;width:140px;height:140px;border-radius:10px;border:1px solid #e3e8df;object-fit:contain;" />` : ""}
+              </div>
+            `).join("")}
           </div>
-        `).join("")}
+        </td></tr>
       `
       : "";
-
-  const cashHtml =
-    payment?.payment_method === "efectivo"
-      ? `<h3>Entrega presencial</h3><p>El pago se realizará en efectivo según la modalidad de entrega acordada.</p>`
-      : "";
-
   await transporter.sendMail({
     from: `"VidaBajoAgua" <${process.env.SMTP_USER}>`,
     to: customer.email,
