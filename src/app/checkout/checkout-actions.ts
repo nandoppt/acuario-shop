@@ -54,6 +54,17 @@ export async function getMyCheckoutProfile(): Promise<{
 
 
 
+function getEmailStatusStyle(status: string) {
+  const styles: Record<string, { bg: string; border: string; text: string; dot: string }> = {
+    pending: { bg: "#fff7ed", border: "#fed7aa", text: "#9a3412", dot: "#f59e0b" },
+    confirmed: { bg: "#ecfdf5", border: "#a7f3d0", text: "#047857", dot: "#10b981" },
+    preparing: { bg: "#eff6ff", border: "#bfdbfe", text: "#1d4ed8", dot: "#3b82f6" },
+    shipped: { bg: "#f0f9ff", border: "#bae6fd", text: "#0369a1", dot: "#0ea5e9" },
+    delivered: { bg: "#ecfdf5", border: "#a7f3d0", text: "#047857", dot: "#059669" },
+    cancelled: { bg: "#fef2f2", border: "#fecaca", text: "#b91c1c", dot: "#ef4444" },
+  };
+  return styles[status] ?? styles.pending;
+}
 async function sendOrderConfirmationEmail(order: any) {
   const customer = {
     first_name: order.buyer_first_name,
@@ -72,6 +83,24 @@ async function sendOrderConfirmationEmail(order: any) {
     order.shipping_method,
     Number(order.shipping_cost) || 0,
   );
+  const statusLabels: Record<string, string> = {
+    pending: "Pendiente",
+    confirmed: "Confirmado",
+    preparing: "Preparando",
+    shipped: "Enviado",
+    delivered: "Entregado",
+    cancelled: "Cancelado",
+  };
+  const statusLabel = statusLabels[order.status] ?? "Pendiente";
+  const statusStyle = getEmailStatusStyle(order.status ?? "pending");
+  const orderNumber = String(order.order_number).padStart(4, "0");
+  const paymentLabels: Record<string, string> = {
+    transferencia: "Transferencia / QR",
+    efectivo: "Pago en efectivo",
+    payphone: "PayPhone",
+  };
+  const paymentMethodLabel =
+    paymentLabels[payment?.payment_method] ?? "No especificado";
 
   const supabase = createAdminClient();
   const { data: accounts } = await supabase
@@ -118,36 +147,51 @@ async function sendOrderConfirmationEmail(order: any) {
     from: `"VidaBajoAgua" <${process.env.SMTP_USER}>`,
     to: customer.email,
     ...(order.additional_email ? { cc: order.additional_email } : {}),
-    subject: `Pedido #${String(order.order_number).padStart(4, "0")} recibido — VidaBajoAgua`,
-    text: `Tu pedido #${String(order.order_number).padStart(4, "0")} fue recibido. Código de seguimiento: ${order.tracking_token}. Método de envío: ${shippingMethodLabel}. Costo de envío: ${shippingCostLabel}. Total: ${Number(order.total).toFixed(2)}.`,
+    subject: `Pedido #${orderNumber} recibido · ${statusLabel} — VidaBajoAgua`,
+    text: `VidaBajoAgua — Pedido #${orderNumber}\nEstado: ${statusLabel}\nMétodo de envío: ${shippingMethodLabel}\nCosto de envío: ${shippingCostLabel}\nMétodo de pago: ${paymentMethodLabel}\nTotal: ${Number(order.total).toFixed(2)}\nCódigo de seguimiento: ${order.tracking_token}`,
     html: `
-      <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:680px;margin:auto;">
-        <h2>VidaBajoAgua</h2>
-        <h1>¡Pedido recibido!</h1>
-        <p>Hola ${customer.first_name ?? "cliente"}, hemos recibido correctamente tu pedido.</p>
-        ${order.recipient_is_other ? `
-          <h3>Datos de quien recibirá el pedido</h3>
-          <p><strong>Nombre:</strong> ${order.recipient_first_name} ${order.recipient_last_name}</p>
-          <p><strong>Teléfono:</strong> ${order.recipient_phone}</p>
-        ` : ""}
-        <p><strong>Número de pedido:</strong> #${String(order.order_number).padStart(4, "0")}</p>
-        <p><strong>Código de seguimiento:</strong> ${order.tracking_token}</p>
-        <hr />
-        <h3>Detalle del pedido</h3>
-        <table style="width:100%;border-collapse:collapse;">${itemsHtml}</table>
-        <p><strong>Subtotal:</strong> ${Number(order.subtotal).toFixed(2)}</p>
-        <p><strong>Método de envío:</strong> ${shippingMethodLabel}</p>
-        <p><strong>Costo de envío:</strong> ${shippingCostLabel}</p>
-        <p style="font-size:18px;"><strong>Total:</strong> ${Number(order.total).toFixed(2)}</p>
-        <p><strong>Método de pago:</strong> ${payment?.payment_method ?? "No especificado"}</p>
-        ${order.additional_email ? `<p>Esta confirmación también fue enviada a ${order.additional_email}.</p>` : ""}
-        ${transferHtml}
-        ${cashHtml}
-        <hr />
-        <p>Conserva tu código de seguimiento para consultar el estado de tu pedido.</p>
+      <div style="margin:0;padding:24px 12px;background:#f4f5ef;font-family:Arial,Helvetica,sans-serif;color:#25352d;">
+        <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;max-width:640px;margin:0 auto;border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e7df;border-radius:18px;overflow:hidden;">
+          <tr><td style="padding:22px 24px;background:#243c33;color:#ffffff;">
+            <div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;">VidaBajoAgua</div>
+            <div style="margin-top:6px;font-size:24px;font-weight:700;">Pedido #${orderNumber}</div>
+            <div style="margin-top:5px;font-size:13px;color:#cfe0d7;">Hemos recibido correctamente tu pedido.</div>
+          </td></tr>
+          <tr><td style="padding:18px 24px 8px;">
+            <span style="display:inline-block;padding:7px 11px;border:1px solid ${statusStyle.border};border-radius:999px;background:${statusStyle.bg};color:${statusStyle.text};font-size:12px;font-weight:700;">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${statusStyle.dot};margin-right:7px;"></span>${statusLabel}
+            </span>
+            <div style="margin-top:12px;font-size:14px;color:#526259;">Hola <strong style="color:#25352d;">${customer.first_name ?? "cliente"}</strong>, estos son los detalles de tu compra.</div>
+          </td></tr>
+          <tr><td style="padding:8px 24px 0;">
+            <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">${itemsHtml}</table>
+          </td></tr>
+          <tr><td style="padding:16px 24px 8px;">
+            <div style="padding:14px 16px;border-radius:14px;background:#f7f8f4;border:1px solid #e7ebe3;">
+              <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;font-size:13px;">
+                <tr><td style="padding:3px 0;color:#69776f;">Subtotal</td><td style="padding:3px 0;text-align:right;">$${Number(order.subtotal).toFixed(2)}</td></tr>
+                <tr><td style="padding:3px 0;color:#69776f;">Método de envío</td><td style="padding:3px 0;text-align:right;font-weight:600;">${shippingMethodLabel}</td></tr>
+                <tr><td style="padding:3px 0;color:#69776f;">Costo de envío</td><td style="padding:3px 0;text-align:right;font-weight:600;">${shippingCostLabel}</td></tr>
+                <tr><td style="padding:10px 0 3px;border-top:1px solid #dde3da;font-size:15px;font-weight:700;">Total</td><td style="padding:10px 0 3px;border-top:1px solid #dde3da;text-align:right;font-size:18px;font-weight:700;">$${Number(order.total).toFixed(2)}</td></tr>
+              </table>
+            </div>
+          </td></tr>
+          <tr><td style="padding:8px 24px;">
+            <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">
+              <tr>
+                <td style="width:50%;vertical-align:top;padding-right:6px;"><div style="padding:13px 14px;border:1px solid #e2e7df;border-radius:12px;"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#718078;font-weight:700;">Pago</div><div style="margin-top:5px;font-size:13px;font-weight:600;">${paymentMethodLabel}</div></div></td>
+                <td style="width:50%;vertical-align:top;padding-left:6px;"><div style="padding:13px 14px;border:1px solid #e2e7df;border-radius:12px;"><div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#718078;font-weight:700;">Seguimiento</div><div style="margin-top:5px;font-size:11px;font-weight:600;word-break:break-all;">${order.tracking_token}</div></div></td>
+              </tr>
+            </table>
+          </td></tr>
+          ${order.recipient_is_other ? `<tr><td style="padding:8px 24px;"><div style="padding:14px 16px;border:1px solid #e2e7df;border-radius:12px;background:#fbfcf8;"><div style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#718078;font-weight:700;">Persona que recibe</div><div style="margin-top:6px;font-size:14px;font-weight:600;">${order.recipient_first_name} ${order.recipient_last_name}</div><div style="margin-top:2px;font-size:13px;color:#66766d;">${order.recipient_phone}</div></div></td></tr>` : ""}
+          ${order.additional_email ? `<tr><td style="padding:8px 24px;"><div style="padding:11px 14px;border-radius:12px;background:#f5f7f2;color:#5f6d64;font-size:12px;">Esta confirmación también fue enviada a <strong>${order.additional_email}</strong>.</div></td></tr>` : ""}
+          ${payment?.payment_method === "efectivo" ? `<tr><td style="padding:8px 24px;"><div style="padding:12px 14px;border:1px solid #fde68a;border-radius:12px;background:#fffbeb;color:#854d0e;font-size:12px;"><strong>Entrega presencial.</strong> El pago se realizará en efectivo según la modalidad acordada.</div></td></tr>` : ""}
+          ${transferHtml}
+          <tr><td style="padding:18px 24px 22px;text-align:center;border-top:1px solid #eef1eb;"><div style="font-size:12px;color:#748178;">Conserva tu código de seguimiento para consultar tu pedido.</div><div style="margin-top:5px;font-size:12px;color:#9aa49d;">VidaBajoAgua · Ecuador</div></td></tr>
+        </table>
       </div>
-    `,
-  });
+    `,  });
 }
 
 function createTransporter() {
@@ -288,6 +332,7 @@ export async function createPendingOrder(
             shipping_cost,
             shipping_method,
             total,
+            status,
             buyer_first_name,
             buyer_last_name,
             buyer_email,
