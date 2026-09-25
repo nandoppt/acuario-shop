@@ -32,7 +32,7 @@ export default async function BibliotecaPage() {
       <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {(guides ?? []).map((guide) => {
           const category = Array.isArray(guide.category) ? guide.category[0] : guide.category;
-          return <Link key={guide.id} href={\`/guias/\${guide.slug}\`} className="group flex min-h-60 flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-lg">
+          return <Link key={guide.id} href={`/guias/\${guide.slug}`} className="group flex min-h-60 flex-col rounded-2xl border border-border bg-card p-6 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-lg">
             <div className="flex items-center justify-between gap-4"><span className="text-xs font-medium uppercase tracking-[0.16em] text-primary">{category?.name}</span><span className="text-xs text-muted-foreground">{guide.reading_time}</span></div>
             <h2 className="mt-5 text-xl font-semibold tracking-tight">{guide.title}</h2>
             <p className="mt-3 text-sm leading-6 text-muted-foreground">{guide.excerpt}</p>
