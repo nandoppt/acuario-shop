@@ -59,6 +59,10 @@ export function CheckoutForm() {
   const [payment, setPayment] =
     useState<PaymentMethod>("transferencia");
 
+  const [recipientIsOther, setRecipientIsOther] = useState(false);
+
+  const [additionalEmailEnabled, setAdditionalEmailEnabled] = useState(false);
+
   const [loading, setLoading] =
     useState(false);
 
@@ -387,86 +391,108 @@ const total =
     ? subtotal + shippingCost
     : null;
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
+async function handleSubmit(
+  event: FormEvent<HTMLFormElement>,
+) {
+  event.preventDefault();
+
+  setError("");
+
+  if (items.length === 0) {
+    setError(
+      "Tu carrito está vacío.",
+    );
+    return;
+  }
+
+  if (
+    payment !== "efectivo" &&
+    isAuthenticated &&
+    !selectedAddressId
   ) {
-    event.preventDefault();
+    setError(
+      "Debes seleccionar una dirección de entrega.",
+    );
+    return;
+  }
 
-    setError("");
-
-    if (items.length === 0) {
+  if (recipientIsOther) {
+    if (
+      !form.recipient_first_name.trim() ||
+      !form.recipient_last_name.trim() ||
+      !form.recipient_phone.trim()
+    ) {
       setError(
-        "Tu carrito está vacío.",
+        "Completa los datos de la persona que recibirá el pedido.",
       );
       return;
     }
+  }
 
-    if (payment !== "efectivo" && isAuthenticated && !selectedAddressId) {
-      setError("Debes seleccionar una dirección de entrega.");
+  if (
+    additionalEmailEnabled &&
+    form.additional_email.trim() &&
+    !form.additional_email.includes("@")
+  ) {
+    setError(
+      "Ingresa un correo adicional válido.",
+    );
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const checkoutItems = items.map((item) => ({
+      product_id: item.productId,
+      quantity: item.quantity,
+    }));
+
+    const result = await createPendingOrder({
+      first_name: form.first_name,
+      last_name: form.last_name,
+      email: form.email,
+      phone: form.phone,
+      province: form.province,
+      city: form.city,
+      parish: form.parish,
+      address: form.address,
+      reference: form.reference,
+      payment_method: payment,
+      shipping_cost: shippingCost ?? 0,
+      notes: form.notes,
+      items: checkoutItems,
+      address_id: selectedAddressId,
+
+      recipient_is_other: recipientIsOther,
+      recipient_first_name: recipientIsOther
+        ? form.recipient_first_name
+        : "",
+      recipient_last_name: recipientIsOther
+        ? form.recipient_last_name
+        : "",
+      recipient_phone: recipientIsOther
+        ? form.recipient_phone
+        : "",
+      additional_email: additionalEmailEnabled
+        ? form.additional_email
+        : "",
+    });
+
+    if (!result.success) {
+      setError(
+        result.error ||
+          "No se pudo crear el pedido.",
+      );
+
       return;
     }
 
-    if (recipientIsOther) {
-      if (
-        !form.recipient_first_name.trim() ||
-        !form.recipient_last_name.trim() ||
-        !form.recipient_phone.trim()
-      ) {
-        setError("Completa los datos de la persona que recibirá el pedido.");
-        return;
-      }
-    }
-
-    if (
-      additionalEmailEnabled &&
-      form.additional_email.trim() &&
-      !form.additional_email.includes("@")
-    ) {
-      setError("Ingresa un correo adicional válido.");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const result =
-        await createPendingOrder({
-          ...form,
-          address_id: isAuthenticated ? selectedAddressId : null,
-
-          payment_method: payment,
-
-          shipping_cost: shippingCost ?? 0,
-
-          notes: form.notes,
-          recipient_is_other: recipientIsOther,
-          recipient_first_name: recipientIsOther ? form.recipient_first_name : "",
-          recipient_last_name: recipientIsOther ? form.recipient_last_name : "",
-          recipient_phone: recipientIsOther ? form.recipient_phone : "",
-          additional_email: additionalEmailEnabled ? form.additional_email : "",
-
-          items: items.map((item) => ({
-            product_id:
-              item.productId,
-            quantity:
-              item.quantity,
-          })),
-        });
-
-      if (!result.success) {
-        setError(
-          result.error ||
-            "No se pudo crear el pedido.",
-        );
-
-        return;
-      }
-
-      /*
-       * El pedido ya fue creado correctamente.
-       * Ahora sí podemos limpiar el carrito.
-       */
-      clearCart();
+    /*
+     * El pedido ya fue creado correctamente.
+     * Ahora sí podemos limpiar el carrito.
+     */
+    clearCart();
 
       /*
        * Guardamos temporalmente la información
