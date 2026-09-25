@@ -38,7 +38,7 @@ async function loadGuide(slug: string) {
   const { data: guide, error } = await supabase
     .from("guides")
     .select(
-      "id, slug, title, excerpt, reading_time, difficulty, author_name, cover_image, cover_alt, published_at, reviewed_at, category_id, category:guide_categories(name, slug)",
+      "id, slug, title, excerpt, reading_time, difficulty, author_name, cover_image, cover_alt, published_at, updated_at, category_id, category:guide_categories(name, slug)",
     )
     .eq("slug", slug)
     .eq("status", "published")
@@ -181,7 +181,7 @@ export default async function GuidePage({ params }: Props) {
     ? guide.category[0]
     : guide.category;
   const publishedDate = formatDate(guide.published_at);
-  const reviewedDate = formatDate(guide.reviewed_at);
+  const updatedDate = formatDate(guide.updated_at);
 
   return (
     <main className="min-h-screen">
@@ -230,7 +230,7 @@ export default async function GuidePage({ params }: Props) {
                 </span>
               </span>
               {publishedDate && <span>Publicado {publishedDate}</span>}
-              {reviewedDate && <span>Revisado {reviewedDate}</span>}
+              {updatedDate && <span>Actualizado {updatedDate}</span>}
             </div>
           </div>
         </header>
