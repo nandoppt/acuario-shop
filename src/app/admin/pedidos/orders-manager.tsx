@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { getShippingCostLabel, getShippingMethodLabel } from "@/lib/shipping/shipping-method";
 import {
   ChevronDown,
   CreditCard,
@@ -48,6 +49,7 @@ type Order = {
   status: string;
   subtotal: number;
   shipping_cost: number;
+  shipping_method: string;
   total: number;
   notes: string | null;
   created_at: string;
@@ -503,6 +505,12 @@ export function OrdersManager({
                             )}
                           </span>
                         )}
+
+                        <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium">
+                          {getShippingMethodLabel(
+                            order.shipping_method,
+                          )}
+                        </span>
                       </div>
 
                       <div className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground sm:flex-row sm:items-center sm:gap-3">
@@ -733,11 +741,24 @@ export function OrdersManager({
 
                           <div className="flex justify-between gap-4">
                             <span className="text-muted-foreground">
-                              Envío
+                              Método de envío
                             </span>
 
-                            <span>
-                              {formatCurrency(
+                            <span className="text-right font-medium">
+                              {getShippingMethodLabel(
+                                order.shipping_method,
+                              )}
+                            </span>
+                          </div>
+
+                          <div className="flex justify-between gap-4">
+                            <span className="text-muted-foreground">
+                              Costo de envío
+                            </span>
+
+                            <span className="text-right">
+                              {getShippingCostLabel(
+                                order.shipping_method,
                                 order.shipping_cost,
                               )}
                             </span>
