@@ -3,6 +3,10 @@
 import nodemailer from "nodemailer";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import {
+  getShippingCostLabel,
+  getShippingMethodLabel,
+} from "@/lib/shipping/shipping-method";
 
 type CheckoutItem = {
   product_id: string;
@@ -63,6 +67,12 @@ async function sendOrderConfirmationEmail(order: any) {
 
   if (!customer?.email) return;
 
+  const shippingMethodLabel = getShippingMethodLabel(order.shipping_method);
+  const shippingCostLabel = getShippingCostLabel(
+    order.shipping_method,
+    Number(order.shipping_cost) || 0,
+  );
+
   const supabase = createAdminClient();
   const { data: accounts } = await supabase
     .from("payment_accounts")
@@ -109,7 +119,7 @@ async function sendOrderConfirmationEmail(order: any) {
     to: customer.email,
     ...(order.additional_email ? { cc: order.additional_email } : {}),
     subject: `Pedido #${String(order.order_number).padStart(4, "0")} recibido — VidaBajoAgua`,
-    text: `Tu pedido #${String(order.order_number).padStart(4, "0")} fue recibido. Código de seguimiento: ${order.tracking_token}. Total: ${Number(order.total).toFixed(2)}.`,
+    text: `Tu pedido #${String(order.order_number).padStart(4, "0")} fue recibido. Código de seguimiento: ${order.tracking_token}. Método de envío: ${shippingMethodLabel}. Costo de envío: ${shippingCostLabel}. Total: ${Number(order.total).toFixed(2)}.`,
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;max-width:680px;margin:auto;">
         <h2>VidaBajoAgua</h2>
@@ -126,7 +136,8 @@ async function sendOrderConfirmationEmail(order: any) {
         <h3>Detalle del pedido</h3>
         <table style="width:100%;border-collapse:collapse;">${itemsHtml}</table>
         <p><strong>Subtotal:</strong> ${Number(order.subtotal).toFixed(2)}</p>
-        <p><strong>Envío:</strong> ${Number(order.shipping_cost).toFixed(2)}</p>
+        <p><strong>Método de envío:</strong> ${shippingMethodLabel}</p>
+        <p><strong>Costo de envío:</strong> ${shippingCostLabel}</p>
         <p style="font-size:18px;"><strong>Total:</strong> ${Number(order.total).toFixed(2)}</p>
         <p><strong>Método de pago:</strong> ${payment?.payment_method ?? "No especificado"}</p>
         ${order.additional_email ? `<p>Esta confirmación también fue enviada a ${order.additional_email}.</p>` : ""}
@@ -275,6 +286,7 @@ export async function createPendingOrder(
             tracking_token,
             subtotal,
             shipping_cost,
+            shipping_method,
             total,
             buyer_first_name,
             buyer_last_name,
