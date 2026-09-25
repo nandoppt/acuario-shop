@@ -87,6 +87,28 @@ function formatDate(value: string) {
   }).format(date);
 }
 
+function getPaymentStatusLabel(status: string) {
+  const labels: Record<string, string> = {
+    pending: "Pendiente",
+    waiting_verification: "Por verificar",
+    paid: "Pagado",
+    rejected: "Rechazado",
+    refunded: "Reembolsado",
+  };
+
+  return labels[status] ?? status;
+}
+
+function getPaymentMethodLabel(method: string) {
+  const labels: Record<string, string> = {
+    transferencia: "Transferencia / QR",
+    efectivo: "Pago en efectivo",
+    payphone: "PayPhone",
+  };
+
+  return labels[method] ?? method;
+}
+
 function paymentStatusClass(status: string) {
   if (status === "paid") {
     return "bg-primary/10 text-primary";
