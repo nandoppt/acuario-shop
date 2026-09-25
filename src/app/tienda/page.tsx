@@ -66,7 +66,7 @@ export default async function TiendaPage({
   return (
     <div className="min-h-screen">
       <section className="border-b border-border bg-muted/30">
-        <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-4">
+        <div className="mx-auto max-w-7xl px-4 py-5 md:px-8 md:py-5">
           <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
             VidaBajoAgua
           </p>
@@ -99,10 +99,10 @@ export default async function TiendaPage({
   </div>
 </section>
 
-      <section className="py-6 md:py-8">
+      <section className="bg-muted/20 py-6 md:py-8">
   <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-5">
-            <p className="text-sm font-medium uppercase tracking-[0.25em] text-primary">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
               Catálogo
             </p>
 
@@ -115,7 +115,7 @@ export default async function TiendaPage({
                     : "Todos los productos"}
               </h2>
 
-              <p className="text-sm text-muted-foreground">
+              <p className="shrink-0 text-xs text-muted-foreground">
                 {filteredProducts.length}{" "}
                 {filteredProducts.length === 1
                   ? "producto disponible"
