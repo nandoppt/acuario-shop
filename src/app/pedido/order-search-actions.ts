@@ -10,6 +10,7 @@ const orderSelect = `
   status,
   subtotal,
   shipping_cost,
+  shipping_method,
   total,
   created_at,
   tracking_token,
