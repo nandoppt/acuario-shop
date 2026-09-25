@@ -280,7 +280,7 @@ const handleVerificationSubmit = async (
     <main className="min-h-screen bg-background">
       <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border bg-background">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border bg-card shadow-sm">
             <Package className="h-6 w-6" />
           </div>
 
@@ -295,8 +295,8 @@ const handleVerificationSubmit = async (
           </p>
         </div>
 
-        <div className="mt-10 rounded-xl border bg-card p-6 shadow-sm">
-          <div className="grid grid-cols-2 rounded-lg border p-1">
+        <div className="mt-10 rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="grid grid-cols-2 rounded-xl border border-border bg-muted/40 p-1">
             <button
               type="button"
               onClick={() => {
@@ -310,7 +310,7 @@ const handleVerificationSubmit = async (
                 setVerificationCode("");
               }}
               className={[
-                "rounded-md px-3 py-2 text-sm font-medium transition",
+                "rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 searchMode === "tracking"
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -332,7 +332,7 @@ const handleVerificationSubmit = async (
                 setVerificationCode("");
               }}
               className={[
-                "rounded-md px-3 py-2 text-sm font-medium transition",
+                "rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
                 searchMode === "customer"
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground",
@@ -366,7 +366,7 @@ const handleVerificationSubmit = async (
                   }
                   placeholder="Ingresa tu código de seguimiento"
                   autoComplete="off"
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-ring"
+                  className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20"
                 />
               </div>
 
@@ -387,7 +387,7 @@ const handleVerificationSubmit = async (
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (
                   <>
@@ -424,7 +424,7 @@ const handleVerificationSubmit = async (
         }
         placeholder="cliente@email.com"
         autoComplete="email"
-        className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none transition focus:ring-2 focus:ring-ring"
+        className="h-12 w-full rounded-xl border border-border bg-background px-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20"
       />
     </div>
 
@@ -445,7 +445,7 @@ const handleVerificationSubmit = async (
     <button
       type="submit"
       disabled={loading}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {loading ? (
         <>
@@ -488,7 +488,7 @@ const handleVerificationSubmit = async (
         }
         placeholder="123456"
         autoComplete="one-time-code"
-        className="w-full rounded-md border bg-background px-3 py-2 text-center text-lg tracking-[0.35em] outline-none transition focus:ring-2 focus:ring-ring"
+        className="h-12 w-full rounded-xl border border-border bg-background px-4 text-center text-lg tracking-[0.35em] outline-none transition focus:border-primary focus:ring-2 focus:ring-ring/20"
       />
     </div>
 
@@ -517,7 +517,7 @@ const handleVerificationSubmit = async (
     <button
       type="submit"
       disabled={loading}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:pointer-events-none disabled:opacity-50"
+      className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 font-medium text-primary-foreground transition-all duration-200 hover:-translate-y-0.5 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {loading ? (
         <>
@@ -580,7 +580,7 @@ const handleVerificationSubmit = async (
         </div>
 
         {result?.success && result.order && (
-          <div className="mt-8 rounded-xl border bg-card shadow-sm">
+          <div className="mt-8 rounded-2xl border border-border bg-card shadow-sm">
             <div className="border-b px-6 py-5">
               <h2 className="text-lg font-semibold">
                 Pedido #{String(result.order.order_number).padStart(4, "0")}
@@ -616,7 +616,7 @@ const handleVerificationSubmit = async (
         )}
 
         {customerOrders.length > 1 && (
-            <div className="mt-8 rounded-xl border bg-card p-6 shadow-sm">
+            <div className="mt-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
               <h2 className="text-lg font-semibold">
                 Pedidos encontrados
               </h2>
@@ -628,7 +628,7 @@ const handleVerificationSubmit = async (
 
               <div className="mt-5 divide-y">
                 {customerOrders.length > 0 && (
-  <div className="mt-8 rounded-xl border bg-card shadow-sm">
+  <div className="mt-8 rounded-2xl border border-border bg-card shadow-sm">
     <div className="border-b px-6 py-5">
       <h2 className="text-lg font-semibold">
         {customerOrders.length === 1
