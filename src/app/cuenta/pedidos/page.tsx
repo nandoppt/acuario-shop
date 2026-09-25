@@ -81,6 +81,7 @@ export default async function OrdersPage() {
         status,
         subtotal,
         shipping_cost,
+        shipping_method,
         total,
         created_at,
         order_items (
