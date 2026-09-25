@@ -679,7 +679,7 @@ const handleVerificationSubmit = async (
                       className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(customerOrder.status).badgeClass}`}
                     >
                       <span
-                        className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(customerOrder.status).dotClass} ${customerOrder.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
+                        className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(customerOrder.status).dotClass} ${customerOrder.status === "pending" ? "order-status-pulse" : ""}`}
                       />
                       {getOrderStatusMeta(customerOrder.status).label}
                     </span>
