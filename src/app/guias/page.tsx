@@ -68,7 +68,7 @@ export default function GuiasPage() {
     <main className="min-h-screen bg-background">
       <section className="relative overflow-hidden border-b border-border">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(75,130,104,0.16),transparent_30%),radial-gradient(circle_at_85%_10%,rgba(51,133,166,0.14),transparent_28%)]" />
-        <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-18">
+        <div className="relative mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
           <div className="max-w-3xl">
             <p className="text-xs font-medium uppercase tracking-[0.22em] text-primary">
               VidaBajoAgua · Centro de conocimiento
@@ -81,7 +81,7 @@ export default function GuiasPage() {
             </p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {sections.map((section) => {
               const Icon = section.icon;
               return (
@@ -116,7 +116,7 @@ export default function GuiasPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-12 md:px-8 md:py-16">
+      <section className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
         <div className="flex items-end justify-between gap-6">
           <div>
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-primary">
@@ -135,7 +135,7 @@ export default function GuiasPage() {
           </Link>
         </div>
 
-        <div className="mt-7 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
           {quickLinks.map((item) => {
             const Icon = item.icon;
             return (
