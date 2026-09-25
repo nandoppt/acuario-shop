@@ -151,16 +151,16 @@ async function sendOrderConfirmationEmail(order: any) {
     html: `
       <div style="margin:0;padding:24px 12px;background:#f4f5ef;font-family:Arial,Helvetica,sans-serif;color:#25352d;">
         <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;max-width:640px;margin:0 auto;border-collapse:separate;border-spacing:0;background:#ffffff;border:1px solid #e2e7df;border-radius:18px;overflow:hidden;">
-          <tr><td style="padding:22px 24px;background:#243c33;color:#ffffff;">
-            <div style="font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;">VidaBajoAgua</div>
-            <div style="margin-top:6px;font-size:24px;font-weight:700;">Pedido #${orderNumber}</div>
-            <div style="margin-top:5px;font-size:13px;color:#cfe0d7;">Hemos recibido correctamente tu pedido.</div>
+          <tr><td style="padding:22px 24px;background:#203a31;color:#ffffff;border-bottom:4px solid #78a58d;">
+            <div style="font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#d7e7df;">VidaBajoAgua</div>
+            <div style="margin-top:5px;font-size:23px;line-height:1.2;font-weight:700;">Pedido #${orderNumber}</div>
+            <div style="margin-top:6px;font-size:13px;color:#cfe0d7;">Hemos recibido correctamente tu pedido.</div>
           </td></tr>
-          <tr><td style="padding:18px 24px 8px;">
-            <span style="display:inline-block;padding:7px 11px;border:1px solid ${statusStyle.border};border-radius:999px;background:${statusStyle.bg};color:${statusStyle.text};font-size:12px;font-weight:700;">
+          <tr><td style="padding:16px 24px 6px;">
+            <div style="display:inline-block;padding:8px 12px;border:1px solid ${statusStyle.border};border-radius:999px;background:${statusStyle.bg};color:${statusStyle.text};font-size:12px;font-weight:700;">
               <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${statusStyle.dot};margin-right:7px;"></span>${statusLabel}
-            </span>
-            <div style="margin-top:12px;font-size:14px;color:#526259;">Hola <strong style="color:#25352d;">${customer.first_name ?? "cliente"}</strong>, estos son los detalles de tu compra.</div>
+            </div>
+            <div style="margin-top:10px;font-size:14px;color:#526259;">Hola <strong style="color:#25352d;">${customer.first_name ?? "cliente"}</strong>, estos son los detalles de tu compra.</div>
           </td></tr>
           <tr><td style="padding:8px 24px 0;">
             <table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;">${itemsHtml}</table>
