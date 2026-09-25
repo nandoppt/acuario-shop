@@ -241,7 +241,7 @@ export function CatalogSearch({
             }}
             onKeyDown={handleKeyDown}
             placeholder="Buscar plantas, filtros, iluminación..."
-            className={`w-full border border-border/80 bg-background/95 text-sm outline-none shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary/10 ${
+            className={`w-full border border-border/80 bg-background/95 text-xs outline-none shadow-sm transition focus:border-primary focus:ring-2 focus:ring-primary/10 ${
               compact
                 ? "h-9 rounded-full pl-9 pr-9"
                 : "h-10 rounded-xl pl-10 pr-10"
@@ -288,11 +288,11 @@ export function CatalogSearch({
                 }`}
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
+                  <p className="truncate text-xs font-medium">
                     {product.name}
                   </p>
 
-                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                  <p className="mt-0.5 truncate text-[10px] text-muted-foreground">
                     {product.categories?.name ??
                       "Sin categoría"}
                     {product.brand
@@ -301,7 +301,7 @@ export function CatalogSearch({
                   </p>
                 </div>
 
-                <p className="shrink-0 text-sm font-medium text-primary">
+                <p className="shrink-0 text-xs font-medium text-primary">
                   ${product.price.toFixed(2)}
                 </p>
               </button>
