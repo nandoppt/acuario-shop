@@ -11,6 +11,7 @@ type OrderStatusMeta = {
   badgeClass: string;
   dotClass: string;
   softClass: string;
+  buttonClass: string;
 };
 
 export const orderStatusMeta: Record<
@@ -25,6 +26,8 @@ export const orderStatusMeta: Record<
       "bg-amber-500 dark:bg-amber-400",
     softClass:
       "border-amber-500/20 bg-amber-500/5 text-amber-800 dark:border-amber-400/20 dark:bg-amber-400/5 dark:text-amber-200",
+    buttonClass:
+      "bg-amber-500 text-white hover:bg-amber-600",
   },
   confirmed: {
     label: "Confirmado",
@@ -34,6 +37,8 @@ export const orderStatusMeta: Record<
       "bg-emerald-500 dark:bg-emerald-400",
     softClass:
       "border-emerald-500/20 bg-emerald-500/5 text-emerald-800 dark:border-emerald-400/20 dark:bg-emerald-400/5 dark:text-emerald-200",
+    buttonClass:
+      "bg-emerald-600 text-white hover:bg-emerald-700",
   },
   preparing: {
     label: "Preparando",
@@ -43,6 +48,8 @@ export const orderStatusMeta: Record<
       "bg-blue-500 dark:bg-blue-400",
     softClass:
       "border-blue-500/20 bg-blue-500/5 text-blue-800 dark:border-blue-400/20 dark:bg-blue-400/5 dark:text-blue-200",
+    buttonClass:
+      "bg-blue-600 text-white hover:bg-blue-700",
   },
   shipped: {
     label: "Enviado",
@@ -52,6 +59,8 @@ export const orderStatusMeta: Record<
       "bg-sky-500 dark:bg-sky-400",
     softClass:
       "border-sky-500/20 bg-sky-500/5 text-sky-800 dark:border-sky-400/20 dark:bg-sky-400/5 dark:text-sky-200",
+    buttonClass:
+      "bg-sky-600 text-white hover:bg-sky-700",
   },
   delivered: {
     label: "Entregado",
@@ -61,6 +70,8 @@ export const orderStatusMeta: Record<
       "bg-emerald-600 dark:bg-emerald-500",
     softClass:
       "border-emerald-600/20 bg-emerald-600/5 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/5 dark:text-emerald-200",
+    buttonClass:
+      "bg-emerald-700 text-white hover:bg-emerald-800",
   },
   cancelled: {
     label: "Cancelado",
@@ -70,6 +81,8 @@ export const orderStatusMeta: Record<
       "bg-red-500 dark:bg-red-400",
     softClass:
       "border-red-500/20 bg-red-500/5 text-red-800 dark:border-red-400/20 dark:bg-red-400/5 dark:text-red-200",
+    buttonClass:
+      "bg-red-600 text-white hover:bg-red-700",
   },
 };
 
@@ -93,5 +106,7 @@ export function getOrderStatusMeta(
       "bg-muted-foreground",
     softClass:
       "border-border bg-secondary text-foreground",
+    buttonClass:
+      "bg-primary text-primary-foreground hover:opacity-90",
   };
 }
