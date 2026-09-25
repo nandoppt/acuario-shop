@@ -20,9 +20,12 @@ function cleanSearch(value: string) {
 export default async function AdminGuiasPage({ searchParams }: Props) {
   const params = await searchParams;
   const query = cleanSearch(params.q ?? "");
-  const status = params.estado === "published" || params.estado === "draft"
-    ? params.estado
-    : "";
+  const status =
+    params.estado === "published" ||
+    params.estado === "draft" ||
+    params.estado === "archived"
+      ? params.estado
+      : "";
   const categorySlug = (params.categoria ?? "").trim().toLowerCase();
 
   const supabase = await createClient();
@@ -152,7 +155,7 @@ export default async function AdminGuiasPage({ searchParams }: Props) {
           >
             <option value="">Todos los estados</option>
             <option value="published">Publicadas</option>
-            <option value="draft">Borradores</option>
+            <option value="draft">Borradores</option><option value="archived">Archivadas</option>
           </select>
 
           <button
@@ -193,10 +196,16 @@ export default async function AdminGuiasPage({ searchParams }: Props) {
                           "rounded-full px-2.5 py-1 text-xs font-medium " +
                           (guide.status === "published"
                             ? "bg-primary/10 text-primary"
-                            : "bg-muted text-muted-foreground")
+                            : guide.status === "archived"
+                              ? "bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                              : "bg-muted text-muted-foreground")
                         }
                       >
-                        {guide.status === "published" ? "Publicada" : "Borrador"}
+                        {guide.status === "published"
+                          ? "Publicada"
+                          : guide.status === "archived"
+                            ? "Archivada"
+                            : "Borrador"}
                       </span>
                       {guide.featured && (
                         <span className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium">
