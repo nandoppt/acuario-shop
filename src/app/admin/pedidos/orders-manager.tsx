@@ -202,22 +202,22 @@ export function OrdersManager({
       {/* Estadísticas */}
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+          <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
             Pendientes
           </p>
 
-          <p className="mt-2 text-3xl font-semibold">
+          <p className="mt-2 text-3xl font-semibold text-amber-800 dark:text-amber-200">
             {pendingOrders}
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <p className="text-sm text-muted-foreground">
+        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+          <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
             Pagados
           </p>
 
-          <p className="mt-2 text-3xl font-semibold">
+          <p className="mt-2 text-3xl font-semibold text-emerald-800 dark:text-emerald-200">
             {paidOrders}
           </p>
         </div>
@@ -438,7 +438,7 @@ export function OrdersManager({
                           className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(order.status).badgeClass}`}
                         >
                           <span
-                            className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(order.status).dotClass}`}
+                            className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(order.status).dotClass} ${order.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
                           />
                           {getOrderStatusMeta(order.status).label}
                         </span>
