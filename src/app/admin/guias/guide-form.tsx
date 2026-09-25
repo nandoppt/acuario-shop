@@ -268,6 +268,7 @@ export function GuideForm({ action, categories, authors, initial }: Props) {
               >
                 <option value="draft">Borrador</option>
                 <option value="published">Publicada</option>
+                <option value="archived">Archivada</option>
               </select>
             </div>
           </div>
