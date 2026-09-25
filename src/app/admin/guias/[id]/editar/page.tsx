@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { updateGuide } from "../actions";
-import { GuideForm } from "../guide-form";
+import { updateGuide } from "../../actions";
+import { GuideForm } from "../../guide-form";
 
 type Props = { params: Promise<{ id: string }> };
 export const dynamic = "force-dynamic";
