@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
+import {
+  getShippingCostLabel,
+  getShippingMethodLabel,
+} from "@/lib/shipping/shipping-method";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +40,7 @@ export default async function OrderDetailPage({
         status,
         subtotal,
         shipping_cost,
+        shipping_method,
         total,
         notes,
         created_at,
@@ -151,6 +156,15 @@ export default async function OrderDetailPage({
     efectivo: "Pago en efectivo",
     payphone: "PayPhone",
   };
+
+  const shippingMethodLabel = getShippingMethodLabel(
+    order.shipping_method,
+  );
+
+  const shippingCostLabel = getShippingCostLabel(
+    order.shipping_method,
+    Number(order.shipping_cost) || 0,
+  );
 
   const paymentStatuses: Record<
     string,
@@ -330,14 +344,21 @@ export default async function OrderDetailPage({
 
               <div className="flex justify-between">
                 <span className="text-muted-foreground">
-                  Envío
+                  Método de envío
                 </span>
 
-                <span>
-                  $
-                  {Number(
-                    order.shipping_cost,
-                  ).toFixed(2)}
+                <span className="text-right font-medium">
+                  {shippingMethodLabel}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">
+                  Costo de envío
+                </span>
+
+                <span className="text-right">
+                  {shippingCostLabel}
                 </span>
               </div>
 
