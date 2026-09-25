@@ -60,6 +60,26 @@ export function TrackedOrderDetails({
   const address = getRelation(order.addresses);
   const payment = getRelation(order.payments);
 
+  const shippingMethodLabels: Record<string, string> = {
+    presencial: "Entrega presencial",
+    gratis: "Envío gratis",
+    cobertura: "Envío con tarifa de cobertura",
+    por_confirmar: "Envío por confirmar",
+  };
+
+  const shippingMethodLabel =
+    shippingMethodLabels[order.shipping_method] ??
+    "Envío por confirmar";
+
+  const shippingCostLabel =
+    order.shipping_method === "presencial"
+      ? "Sin costo de envío"
+      : order.shipping_method === "gratis"
+        ? "Gratis"
+        : order.shipping_method === "por_confirmar"
+          ? "Por confirmar"
+          : formatCurrency(order.shipping_cost);
+
   const currentStatus = order.status ?? null;
 
   const currentStatusIndex = currentStatus
@@ -226,17 +246,23 @@ export function TrackedOrderDetails({
               </span>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <span className="text-muted-foreground">
-                Envío
+                Método de envío
               </span>
 
-              <span>
-                {order.shipping_cost === 0
-                  ? "Gratis"
-                  : formatCurrency(
-                      order.shipping_cost,
-                    )}
+              <span className="text-right font-medium">
+                {shippingMethodLabel}
+              </span>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-muted-foreground">
+                Costo de envío
+              </span>
+
+              <span className="text-right">
+                {shippingCostLabel}
               </span>
             </div>
 
