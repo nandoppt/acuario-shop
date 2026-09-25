@@ -3,12 +3,18 @@
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
+import {
+  getShippingCostLabel,
+  getShippingMethodLabel,
+} from "@/lib/shipping/shipping-method";
+
 type Order = {
   id: string;
   order_number: number;
   status: string;
   subtotal: number;
   shipping_cost: number;
+  shipping_method: string;
   total: number;
   created_at: string;
   order_items:
@@ -129,13 +135,26 @@ export function OrdersAccordion({
                     </span>
                   </div>
 
-                  <div className="mt-2 flex items-center justify-between text-sm">
+                  <div className="mt-2 flex items-center justify-between gap-4 text-sm">
                     <span className="text-muted-foreground">
-                      Envío
+                      Método de envío
                     </span>
 
-                    <span>
-                      {formatCurrency(
+                    <span className="text-right font-medium">
+                      {getShippingMethodLabel(
+                        order.shipping_method,
+                      )}
+                    </span>
+                  </div>
+
+                  <div className="mt-2 flex items-center justify-between gap-4 text-sm">
+                    <span className="text-muted-foreground">
+                      Costo de envío
+                    </span>
+
+                    <span className="text-right">
+                      {getShippingCostLabel(
+                        order.shipping_method,
                         Number(order.shipping_cost),
                       )}
                     </span>
