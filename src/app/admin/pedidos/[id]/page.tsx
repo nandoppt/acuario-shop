@@ -15,6 +15,7 @@ import {
   getShippingCostLabel,
   getShippingMethodLabel,
 } from "@/lib/shipping/shipping-method";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 export const dynamic = "force-dynamic";
 
@@ -157,6 +158,8 @@ export default async function OrderDetailPage({
     payphone: "PayPhone",
   };
 
+  const statusMeta = getOrderStatusMeta(order.status);
+
   const shippingMethodLabel = getShippingMethodLabel(
     order.shipping_method,
   );
@@ -175,18 +178,6 @@ export default async function OrderDetailPage({
     paid: "Pagado",
     rejected: "Rechazado",
     refunded: "Reembolsado",
-  };
-
-  const orderStatuses: Record<
-    string,
-    string
-  > = {
-    pending: "Pendiente",
-    confirmed: "Confirmado",
-    preparing: "Preparando",
-    shipped: "Enviado",
-    delivered: "Entregado",
-    cancelled: "Cancelado",
   };
 
   return (
@@ -223,9 +214,13 @@ export default async function OrderDetailPage({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-secondary px-3 py-1.5 text-sm font-medium">
-              {orderStatuses[order.status] ??
-                order.status}
+            <span
+              className={`inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium ${statusMeta.badgeClass}`}
+            >
+              <span
+                className={`h-2 w-2 rounded-full ${statusMeta.dotClass}`}
+              />
+              {statusMeta.label}
             </span>
 
             {payment && (
