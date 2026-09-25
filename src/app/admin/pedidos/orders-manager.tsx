@@ -224,7 +224,7 @@ export function OrdersManager({
       {/* Estadísticas */}
 
       <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+        <div className="order-surface border-amber-500/20 bg-amber-500/5 p-5">
           <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
             Pendientes
           </p>
@@ -234,7 +234,7 @@ export function OrdersManager({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-5">
+        <div className="order-surface border-emerald-500/20 bg-emerald-500/5 p-5">
           <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">
             Pagados
           </p>
@@ -244,7 +244,7 @@ export function OrdersManager({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="order-surface p-5">
           <p className="text-sm text-muted-foreground">
             Total pedidos
           </p>
@@ -391,7 +391,7 @@ export function OrdersManager({
       {/* Pedidos */}
 
       {orders.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-card p-10 text-center">
+        <div className="order-surface p-10 text-center">
           <Package
             className="mx-auto text-primary"
             size={40}
@@ -434,7 +434,7 @@ export function OrdersManager({
             return (
               <article
                 key={order.id}
-                className="overflow-hidden rounded-2xl border border-border bg-card"
+                className="order-surface overflow-hidden"
               >
                 {/* Cabecera del acordeón */}
 
@@ -460,7 +460,7 @@ export function OrdersManager({
                           className={`inline-flex items-center gap-2 rounded-full border px-2.5 py-1 text-xs font-medium ${getOrderStatusMeta(order.status).badgeClass}`}
                         >
                           <span
-                            className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(order.status).dotClass} ${order.status === "pending" ? "motion-safe:animate-pulse motion-reduce:animate-none" : ""}`}
+                            className={`h-1.5 w-1.5 rounded-full ${getOrderStatusMeta(order.status).dotClass} ${order.status === "pending" ? "order-status-pulse" : ""}`}
                           />
                           {getOrderStatusMeta(order.status).label}
                         </span>
@@ -508,7 +508,7 @@ export function OrdersManager({
                         Total
                       </p>
 
-                      <p className="mt-1 font-semibold">
+                      <p className="order-total mt-1 font-semibold">
                         {formatCurrency(
                           order.total,
                         )}
@@ -534,7 +534,7 @@ export function OrdersManager({
                     <div className="grid gap-6 p-5 md:p-6 lg:grid-cols-2">
                       {/* Cliente */}
 
-                      <section className="rounded-xl border border-border bg-background p-5">
+                      <section className="order-section p-5">
                         <div className="flex items-center gap-3">
                           <User
                             size={18}
