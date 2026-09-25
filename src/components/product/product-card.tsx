@@ -52,14 +52,14 @@ export function ProductCard({
                 className="text-primary/50"
               />
 
-              <span className="mt-2 text-xs">
+              <span className="mt-2 text-[10px]">
                 Imagen próximamente
               </span>
             </div>
           )}
 
           {product.is_featured && (
-            <span className="absolute left-3 top-3 rounded-full bg-primary/95 px-2.5 py-1 text-[11px] font-semibold text-primary-foreground shadow-sm">
+            <span className="absolute left-3 top-3 rounded-full bg-primary/95 px-2.5 py-1 text-[10px] font-semibold text-primary-foreground shadow-sm">
               Destacado
             </span>
           )}
@@ -67,13 +67,13 @@ export function ProductCard({
       </Link>
 
       <div className="flex flex-1 flex-col p-3.5 sm:p-4">
-        <p className="text-[11px] font-medium uppercase tracking-[0.13em] text-primary">
+        <p className="text-[10px] font-medium uppercase tracking-[0.13em] text-primary">
           {product.categories?.name ??
             "Sin categoría"}
         </p>
 
         <Link href={`/producto/${product.slug}`}>
-          <h2 className="mt-1.5 line-clamp-2 min-h-10 text-[15px] font-semibold leading-5 tracking-tight transition-colors hover:text-primary">
+          <h2 className="mt-1.5 line-clamp-2 min-h-10 text-xs font-semibold leading-4 tracking-tight transition-colors hover:text-primary">
             {product.name}
           </h2>
         </Link>
@@ -81,7 +81,7 @@ export function ProductCard({
         <div className="mt-auto flex items-end justify-between gap-3 pt-3">
           <div>
             {hasDiscount && (
-              <p className="text-xs text-muted-foreground line-through">
+              <p className="text-[10px] text-muted-foreground line-through">
                 $
                 {product.compare_at_price?.toFixed(
                   2,
@@ -89,21 +89,21 @@ export function ProductCard({
               </p>
             )}
 
-            <p className="text-lg font-semibold leading-5 tracking-tight text-foreground">
+            <p className="text-base font-semibold leading-5 tracking-tight text-foreground">
               ${product.price.toFixed(2)}
             </p>
           </div>
 
           <Link
             href={`/producto/${product.slug}`}
-            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+            className="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-medium text-primary transition-colors hover:bg-primary/10"
           >
             Ver producto
             <ArrowRight size={14} />
           </Link>
         </div>
 
-        <div className="mt-3 border-t border-border/70 pt-2.5 text-[11px] text-muted-foreground">
+        <div className="mt-3 border-t border-border/70 pt-2.5 text-[10px] text-muted-foreground">
           {stock > 0
             ? `${stock} disponibles`
             : "Agotado"}
