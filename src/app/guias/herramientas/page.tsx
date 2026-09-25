@@ -60,29 +60,31 @@ export default function HerramientasPage() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {tools.map((tool) => {
             const Icon = tool.icon;
+
             if (!tool.available) {
               return (
                 <div
-                key={tool.title}
-                className="overflow-hidden rounded-3xl border border-border bg-card opacity-80 shadow-sm"
+                  key={tool.title}
+                  className="overflow-hidden rounded-3xl border border-border bg-card opacity-80 shadow-sm"
                 >
-                <div className={`flex h-32 items-center justify-center bg-gradient-to-br ${tool.tone}`}>
-                  <div className="flex size-14 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg">
-                    <Icon className="size-6" strokeWidth={1.8} />
+                  <div className={`flex h-32 items-center justify-center bg-gradient-to-br ${tool.tone}`}>
+                    <div className="flex size-14 items-center justify-center rounded-full bg-white/95 text-primary shadow-lg">
+                      <Icon className="size-6" strokeWidth={1.8} />
+                    </div>
                   </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="font-semibold tracking-tight">{tool.title}</h2>
-                    <span className="text-xs text-muted-foreground">En desarrollo</span>
+                  <div className="p-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h2 className="font-semibold tracking-tight">{tool.title}</h2>
+                      <span className="text-xs text-muted-foreground">En desarrollo</span>
+                    </div>
+                    <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
+                    <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                      Próximamente
+                    </span>
                   </div>
-                  <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
-                  <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-                    Próximamente
-                  </span>
                 </div>
               );
             }
@@ -104,14 +106,16 @@ export default function HerramientasPage() {
                     <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                   </div>
                   <p className="mt-2 text-sm leading-5 text-muted-foreground">{tool.description}</p>
-                  <span className="mt-5 inline-block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+                  <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-[0.14em] text-primary">
                     Abrir herramienta
+                    <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
               </Link>
             );
           })}
         </div>
+
       </div>
     </main>
   );
