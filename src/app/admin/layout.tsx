@@ -12,6 +12,7 @@ import {
   ClipboardList,
   Truck,
   CreditCard,
+  BookOpen,
 } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/server";
@@ -46,6 +47,17 @@ const navigation = [
     label: "Inventario",
     href: "/admin/inventario",
     icon: Boxes,
+  },
+  {
+    label: "Guías",
+    href: "/admin/guias",
+    icon: BookOpen,
+    children: [
+      {
+        label: "Categorías",
+        href: "/admin/guias/categorias",
+      },
+    ],
   },
   {
     label: "Categorías",
@@ -113,14 +125,25 @@ export default async function AdminLayout({
                 const Icon = item.icon;
 
                 return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                  >
-                    <Icon size={18} />
-                    {item.label}
-                  </Link>
+                  <div key={item.href}>
+                    <Link
+                      href={item.href}
+                      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                    >
+                      <Icon size={18} />
+                      {item.label}
+                    </Link>
+
+                    {item.children?.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className="ml-7 flex items-center rounded-lg border-l border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
                 );
               })}
             </nav>
