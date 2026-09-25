@@ -85,7 +85,9 @@ function parseForm(formData: FormData) {
     status:
       String(formData.get("status") ?? "draft") === "published"
         ? "published"
-        : "draft",
+        : String(formData.get("status") ?? "draft") === "archived"
+          ? "archived"
+          : "draft",
     sections,
     sources,
   };
