@@ -101,21 +101,21 @@ export default async function TiendaPage({
 
       <section className="bg-muted/20 py-6 md:py-8">
   <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
+          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
               Catálogo
-            </p>
+            </h2>
 
             <div className="flex items-baseline gap-2 md:gap-3">
-              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">
+              <h3 className="text-base font-medium tracking-tight md:text-lg">
                 {searchTerm
                   ? `Resultados para "${params.busqueda}"`
                   : selectedCategory
                     ? `Productos de ${categoryLabel}`
                     : "Todos los productos"}
-              </h2>
+              </h3>
 
-              <p className="shrink-0 text-xs text-muted-foreground">
+              <p className="shrink-0 text-[11px] font-medium text-muted-foreground md:text-xs">
                 {filteredProducts.length}{" "}
                 {filteredProducts.length === 1
                   ? "producto disponible"
