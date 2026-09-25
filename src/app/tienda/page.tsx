@@ -101,12 +101,12 @@ export default async function TiendaPage({
 
       <section className="bg-muted/20 py-6 md:py-8">
   <div className="mx-auto max-w-7xl px-4 md:px-8">
-          <div className="mb-5 flex items-end justify-between gap-4">
+          <div className="mb-5 flex flex-col gap-2 md:flex-row md:items-baseline md:justify-between">
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
               Catálogo
             </p>
 
-            <div className="mt-2 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div className="flex items-baseline gap-2 md:gap-3">
               <h2 className="text-xl font-semibold tracking-tight md:text-2xl">
                 {searchTerm
                   ? `Resultados para "${params.busqueda}"`
