@@ -35,13 +35,13 @@ export function CategoryFilter({
         Categorías
       </p>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
         <Link
           href={getCategoryHref()}
-          className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
+          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all ${
             !selectedCategory
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-border bg-background hover:border-primary/40 hover:bg-muted"
+              ? "border-primary bg-primary text-primary-foreground shadow-sm"
+              : "border-border/80 bg-background hover:border-primary/40 hover:bg-primary/5"
           }`}
         >
           Todos
