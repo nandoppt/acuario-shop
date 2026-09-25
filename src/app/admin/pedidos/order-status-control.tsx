@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { updateOrderStatus } from "./order-actions";
+import { getOrderStatusMeta } from "@/lib/orders/order-status";
 
 type Props = {
   orderId: string;
@@ -79,6 +80,7 @@ export function OrderStatusControl({
   }
 
   const Icon = next.icon;
+  const nextMeta = getOrderStatusMeta(next.status);
 
   async function handleUpdate() {
     const confirmed =
@@ -126,7 +128,7 @@ export function OrderStatusControl({
         type="button"
         onClick={handleUpdate}
         disabled={loading}
-        className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+        className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-5 py-3 font-medium transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${nextMeta.buttonClass}`}
       >
         {loading ? (
           <>
